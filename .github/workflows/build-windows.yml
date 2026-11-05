@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
   workflow_dispatch:
+
+concurrency:
+  group: build-windows-release
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -54,8 +56,10 @@ jobs:
         with:
           tag_name: ${{ steps.pkg.outputs.version }}
           name: MyBrowser ${{ steps.pkg.outputs.version }} (Windows x64)
+          body: |
+            Installateur Windows x64 (`MyBrowser Setup .exe` + `MyBrowser Portable .exe`) et métadonnées de mise à jour automatique (`latest.yml`).
           files: |
             release/*.exe
             release/*.blockmap
             release/latest.yml
-          generate_release_notes: true
+          generate_release_notes: false
