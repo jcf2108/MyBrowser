@@ -1,0 +1,378 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-05T13:07:00Z",
+  "title": "Design System: MyBrowser",
+  "extensions": {
+    "colorMeta": {
+      "rotring-vermilion": {
+        "role": "primary",
+        "displayName": "Vermillon Rotring",
+        "canonical": "#ff5a26",
+        "tonalRamp": [
+          "oklch(22% 0.08 35)",
+          "oklch(32% 0.13 35)",
+          "oklch(44% 0.17 35)",
+          "oklch(56% 0.20 35)",
+          "oklch(67% 0.22 35)",
+          "oklch(76% 0.17 35)",
+          "oklch(86% 0.10 35)",
+          "oklch(94% 0.04 35)"
+        ]
+      },
+      "rotring-vermilion-hover": {
+        "role": "primary",
+        "displayName": "Vermillon Rotring Survol",
+        "canonical": "#ff7142",
+        "tonalRamp": [
+          "oklch(24% 0.08 37)",
+          "oklch(35% 0.12 37)",
+          "oklch(47% 0.16 37)",
+          "oklch(59% 0.19 37)",
+          "oklch(71% 0.19 37)",
+          "oklch(80% 0.14 37)",
+          "oklch(88% 0.09 37)",
+          "oklch(95% 0.04 37)"
+        ]
+      },
+      "accent-contrast-ink": {
+        "role": "primary",
+        "displayName": "Encre Contraste sur Vermillon",
+        "canonical": "#0d1014",
+        "tonalRamp": [
+          "oklch(17% 0.01 250)",
+          "oklch(26% 0.01 250)",
+          "oklch(37% 0.01 250)",
+          "oklch(49% 0.01 250)",
+          "oklch(61% 0.01 250)",
+          "oklch(73% 0.01 250)",
+          "oklch(85% 0.01 250)",
+          "oklch(94% 0.005 250)"
+        ]
+      },
+      "technical-emerald": {
+        "role": "secondary",
+        "displayName": "Émeraude Technique",
+        "canonical": "#2ea043",
+        "tonalRamp": [
+          "oklch(22% 0.06 148)",
+          "oklch(32% 0.09 148)",
+          "oklch(43% 0.12 148)",
+          "oklch(54% 0.15 148)",
+          "oklch(62% 0.16 148)",
+          "oklch(73% 0.13 148)",
+          "oklch(84% 0.08 148)",
+          "oklch(94% 0.04 148)"
+        ]
+      },
+      "amber-warning": {
+        "role": "tertiary",
+        "displayName": "Ambre d'Alerte Hors-Ligne",
+        "canonical": "#d29922",
+        "tonalRamp": [
+          "oklch(24% 0.05 80)",
+          "oklch(35% 0.08 80)",
+          "oklch(47% 0.11 80)",
+          "oklch(59% 0.13 80)",
+          "oklch(70% 0.15 80)",
+          "oklch(80% 0.12 80)",
+          "oklch(89% 0.07 80)",
+          "oklch(95% 0.03 80)"
+        ]
+      },
+      "crimson-danger": {
+        "role": "tertiary",
+        "displayName": "Rouge Critique de Révocation",
+        "canonical": "#f85149",
+        "tonalRamp": [
+          "oklch(23% 0.08 25)",
+          "oklch(34% 0.12 25)",
+          "oklch(46% 0.16 25)",
+          "oklch(57% 0.19 25)",
+          "oklch(66% 0.21 25)",
+          "oklch(76% 0.15 25)",
+          "oklch(86% 0.09 25)",
+          "oklch(94% 0.04 25)"
+        ]
+      },
+      "slate-drafting-bg": {
+        "role": "neutral",
+        "displayName": "Ardoise Graphite de Fond",
+        "canonical": "#121519",
+        "tonalRamp": [
+          "oklch(19% 0.012 250)",
+          "oklch(24% 0.015 250)",
+          "oklch(31% 0.018 250)",
+          "oklch(40% 0.02 250)",
+          "oklch(52% 0.02 250)",
+          "oklch(66% 0.02 250)",
+          "oklch(80% 0.015 250)",
+          "oklch(93% 0.01 250)"
+        ]
+      },
+      "atelier-panel": {
+        "role": "neutral",
+        "displayName": "Panneau d'Atelier ISO",
+        "canonical": "#1a1f26",
+        "tonalRamp": [
+          "oklch(19% 0.012 250)",
+          "oklch(24% 0.016 250)",
+          "oklch(31% 0.02 250)",
+          "oklch(41% 0.022 250)",
+          "oklch(53% 0.022 250)",
+          "oklch(67% 0.02 250)",
+          "oklch(81% 0.015 250)",
+          "oklch(93% 0.01 250)"
+        ]
+      },
+      "elevated-cartouche": {
+        "role": "neutral",
+        "displayName": "Cartouche Surélevé",
+        "canonical": "#212730",
+        "tonalRamp": [
+          "oklch(20% 0.014 250)",
+          "oklch(27% 0.018 250)",
+          "oklch(35% 0.022 250)",
+          "oklch(45% 0.024 250)",
+          "oklch(57% 0.022 250)",
+          "oklch(70% 0.018 250)",
+          "oklch(83% 0.014 250)",
+          "oklch(94% 0.008 250)"
+        ]
+      },
+      "iso-hairline": {
+        "role": "neutral",
+        "displayName": "Filet Continu ISO 1px",
+        "canonical": "#2a313c",
+        "tonalRamp": [
+          "oklch(21% 0.016 252)",
+          "oklch(31% 0.022 252)",
+          "oklch(40% 0.025 252)",
+          "oklch(50% 0.025 252)",
+          "oklch(61% 0.022 252)",
+          "oklch(73% 0.018 252)",
+          "oklch(84% 0.012 252)",
+          "oklch(94% 0.006 252)"
+        ]
+      },
+      "iso-line-strong": {
+        "role": "neutral",
+        "displayName": "Filet Structurel Fort",
+        "canonical": "#384252",
+        "tonalRamp": [
+          "oklch(23% 0.02 252)",
+          "oklch(34% 0.026 252)",
+          "oklch(38% 0.028 252)",
+          "oklch(49% 0.028 252)",
+          "oklch(60% 0.025 252)",
+          "oklch(72% 0.02 252)",
+          "oklch(84% 0.014 252)",
+          "oklch(94% 0.008 252)"
+        ]
+      },
+      "chalk-ink": {
+        "role": "neutral",
+        "displayName": "Encre Blanc Craie",
+        "canonical": "#e6edf3",
+        "tonalRamp": [
+          "oklch(22% 0.012 245)",
+          "oklch(34% 0.012 245)",
+          "oklch(46% 0.012 245)",
+          "oklch(58% 0.012 245)",
+          "oklch(70% 0.012 245)",
+          "oklch(82% 0.012 245)",
+          "oklch(90% 0.01 245)",
+          "oklch(94% 0.009 245)"
+        ]
+      },
+      "technical-slate-secondary": {
+        "role": "neutral",
+        "displayName": "Ardoise Technique Secondaire",
+        "canonical": "#9ba9bb",
+        "tonalRamp": [
+          "oklch(23% 0.02 248)",
+          "oklch(34% 0.024 248)",
+          "oklch(46% 0.026 248)",
+          "oklch(58% 0.026 248)",
+          "oklch(72% 0.025 248)",
+          "oklch(81% 0.02 248)",
+          "oklch(89% 0.014 248)",
+          "oklch(95% 0.008 248)"
+        ]
+      },
+      "muted-blueprint-ink": {
+        "role": "neutral",
+        "displayName": "Encre Fantôme de Saisie",
+        "canonical": "#8c9db0",
+        "tonalRamp": [
+          "oklch(22% 0.02 248)",
+          "oklch(33% 0.024 248)",
+          "oklch(44% 0.026 248)",
+          "oklch(56% 0.028 248)",
+          "oklch(68% 0.026 248)",
+          "oklch(79% 0.02 248)",
+          "oklch(88% 0.014 248)",
+          "oklch(95% 0.008 248)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display — Titre de Planche ISO",
+        "purpose": "Titre principal en tête des surfaces internes (my://start, my://apps, my://agent, my://privacy, my://3d-lab)."
+      },
+      "headline": {
+        "displayName": "Headline — En-tête de Cartouche",
+        "purpose": "En-têtes de sections fonctionnelles (Registre des favoris, Passerelle API locale, Bibliothèque Userscripts, Tiroir d'édition)."
+      },
+      "title": {
+        "displayName": "Title — Intitulé d'Onglet & Action",
+        "purpose": "Intitulés d'onglets, noms d'applications connectées et libellés de boutons d'action."
+      },
+      "body": {
+        "displayName": "Body — Description Opératoire",
+        "purpose": "Descriptions opératoires et textes explicatifs limités à 68ch–70ch avec variantes OpenType cv02, cv03, cv04, cv11."
+      },
+      "label": {
+        "displayName": "Label — Télémétrie & Protocole (Azeret Mono)",
+        "purpose": "Codes ISO (ISO-01), préfixes d'Omnibox (SYS // MY://, PORT // LOCAL), ports TCP (:3000, :4577), compteurs tabulaires (BLK:14) et coordonnées 3D."
+      }
+    },
+    "shadows": [
+      {
+        "name": "structural-flat",
+        "value": "none",
+        "purpose": "Aucune ombre portée : la hiérarchie repose sur les filets continus de 1px (#2a313c) et l'étagement tonal mat (#121519 → #1a1f26 → #212730)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "iso-transition",
+        "value": "220ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Transition exponentielle d'ouverture/repli de la tranche Spine (240px ↔ 48px) et des cadres Split-View, désactivée sous prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "spine-collapse", "value": "860px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Bouton Primaire Rotring (Cadre Focalisé)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Déclencheur principal réservé au panneau ayant le focus actif, en Vermillon Rotring (#ff5a26) à angles droits (0px).",
+      "html": "<button type=\"button\" class=\"ds-btn-primary\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"square\"><path d=\"M12 5v14M5 12h14\"/></svg><span>Ajouter une application (URL / Port)</span></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: var(--iso-accent, #ff5a26); color: var(--iso-accent-ink, #0d1014); font-family: 'Archivo', system-ui, sans-serif; font-size: 12px; font-weight: 600; line-height: 1.35; border: 1px solid var(--iso-accent, #ff5a26); border-radius: 0px; cursor: pointer; transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background-color: #ff7142; border-color: #ff7142; } .ds-btn-primary:focus-visible { outline: 1px solid var(--iso-accent-ink, #0d1014); outline-offset: -2px; }"
+    },
+    {
+      "name": "Bouton Technique Surélevé (Cartouche Fort)",
+      "kind": "button",
+      "refersTo": "button-elevated",
+      "description": "Action secondaire renforcée (+ Onglet, + App, Extraire, Bloquer) sur fond #212730 et bordure #384252.",
+      "html": "<button type=\"button\" class=\"ds-btn-elevated\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\"><path d=\"M12 5v14M5 12h14\"/></svg><span>Onglet</span></button>",
+      "css": ".ds-btn-elevated { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background-color: var(--iso-elevated, #212730); color: var(--iso-ink, #e6edf3); font-family: 'Archivo', system-ui, sans-serif; font-size: 12px; font-weight: 600; border: 1px solid var(--iso-line-strong, #384252); border-radius: 0px; cursor: pointer; transition: border-color 220ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-elevated:hover { border-color: var(--iso-accent, #ff5a26); } .ds-btn-elevated:focus-visible { outline: 1px solid var(--iso-accent, #ff5a26); outline-offset: -1px; }"
+    },
+    {
+      "name": "Bouton Cartouche Fantôme (Action de Ligne)",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Bouton d'instrumentation standard (Onglet, Split, Sidebar, Sonder) sur fond #121519 et filet 1px #2a313c.",
+      "html": "<button type=\"button\" class=\"ds-btn-ghost\">Split-View</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background-color: var(--iso-bg, #121519); color: var(--iso-ink, #e6edf3); font-family: 'Archivo', system-ui, sans-serif; font-size: 12px; font-weight: 400; border: 1px solid var(--iso-line, #2a313c); border-radius: 0px; cursor: pointer; transition: border-color 220ms cubic-bezier(0.16, 1, 0.3, 1), color 220ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-ghost:hover { border-color: var(--iso-accent, #ff5a26); color: var(--iso-ink, #e6edf3); } .ds-btn-ghost:focus-visible { outline: 1px solid var(--iso-accent, #ff5a26); outline-offset: -1px; }"
+    },
+    {
+      "name": "Omnibox ISO de Protocole & Port",
+      "kind": "input",
+      "refersTo": "input-omnibox",
+      "description": "Barre d'adresse et de commande 28px combinant préfixe de protocole en Azeret Mono, saisie URL/port et déclencheur + App.",
+      "html": "<div class=\"ds-omnibox\"><span class=\"ds-omnibox-prefix\">SYS // MY://</span><input type=\"text\" class=\"ds-omnibox-input\" value=\"my://start\" aria-label=\"Omnibox\" /><button type=\"button\" class=\"ds-omnibox-btn\">+ App</button></div>",
+      "css": ".ds-omnibox { display: flex; align-items: center; height: 28px; background-color: var(--iso-bg, #121519); border: 1px solid var(--iso-line, #2a313c); border-radius: 0px; max-width: 520px; } .ds-omnibox:focus-within { border-color: var(--iso-accent, #ff5a26); } .ds-omnibox-prefix { display: inline-flex; align-items: center; height: 100%; padding: 0 8px; border-right: 1px solid var(--iso-line, #2a313c); font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--iso-ink-secondary, #9ba9bb); white-space: nowrap; } .ds-omnibox-input { flex: 1; min-width: 0; height: 100%; padding: 0 8px; background: transparent; border: none; color: var(--iso-ink, #e6edf3); font-family: 'Azeret Mono', monospace; font-size: 12px; caret-color: var(--iso-accent, #ff5a26); } .ds-omnibox-input:focus { outline: none; } .ds-omnibox-btn { height: 100%; padding: 0 8px; background: transparent; border: none; border-left: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink-secondary, #9ba9bb); font-family: 'Archivo', sans-serif; font-size: 12px; cursor: pointer; } .ds-omnibox-btn:hover { color: var(--iso-ink, #e6edf3); }"
+    },
+    {
+      "name": "Timbres de Focus & Télémétrie Réseau",
+      "kind": "chip",
+      "description": "Badges orthogonaux en Azeret Mono signalant le cadre focalisé (CADRE A // FOCUS), le cadre secondaire ([B]) et le compteur Adblock tabulaire.",
+      "html": "<div class=\"ds-chips-row\"><span class=\"ds-chip-focus\">CADRE A // FOCUS</span><span class=\"ds-chip-secondary\">[B]</span><span class=\"ds-chip-shield\"><span class=\"ds-dot-emerald\"></span>BLK:14</span></div>",
+      "css": ".ds-chips-row { display: inline-flex; align-items: center; gap: 8px; font-family: 'Azeret Mono', monospace; font-variant-numeric: tabular-nums; } .ds-chip-focus { padding: 2px 6px; background-color: var(--iso-accent, #ff5a26); color: var(--iso-accent-ink, #0d1014); font-size: 10px; font-weight: 700; } .ds-chip-secondary { padding: 2px 6px; background-color: var(--iso-signal, #2ea043); color: var(--iso-accent-ink, #0d1014); font-size: 10px; font-weight: 700; } .ds-chip-shield { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px; background-color: var(--iso-bg, #121519); border: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink, #e6edf3); font-size: 11px; } .ds-dot-emerald { width: 6px; height: 6px; background-color: var(--iso-signal, #2ea043); display: inline-block; }"
+    },
+    {
+      "name": "Cartouche d'En-tête Split-View (Ligne de Base 36px)",
+      "kind": "nav",
+      "description": "Barre d'en-tête de 36px alignée au pixel près entre le Cadre A et le Cadre B, soulignée de vermillon sur la vue active.",
+      "html": "<div class=\"ds-pane-header\"><div class=\"ds-pane-left\"><span class=\"ds-pane-stamp\">CADRE A // FOCUS</span><span class=\"ds-pane-title\">Planche de Pilotage ISO</span></div><div class=\"ds-pane-right\"><span class=\"ds-pane-url\">my://start</span><button type=\"button\" class=\"ds-pane-btn\">my://start</button></div></div>",
+      "css": ".ds-pane-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 36px; padding: 0 12px; background-color: var(--iso-panel, #1a1f26); border-bottom: 1px solid var(--iso-accent, #ff5a26); color: var(--iso-ink, #e6edf3); } .ds-pane-left { display: flex; align-items: center; gap: 8px; min-width: 0; } .ds-pane-stamp { padding: 2px 6px; background-color: var(--iso-accent, #ff5a26); color: var(--iso-accent-ink, #0d1014); font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 700; } .ds-pane-title { font-family: 'Archivo', sans-serif; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-pane-right { display: flex; align-items: center; gap: 8px; font-family: 'Azeret Mono', monospace; font-size: 11px; } .ds-pane-url { color: var(--iso-ink-secondary, #9ba9bb); } .ds-pane-btn { padding: 2px 6px; background-color: var(--iso-bg, #121519); border: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink, #e6edf3); font-family: 'Azeret Mono', monospace; font-size: 10px; cursor: pointer; } .ds-pane-btn:hover { border-color: var(--iso-accent, #ff5a26); }"
+    },
+    {
+      "name": "Cartouche de Favori d'Application & Port Configurable",
+      "kind": "card",
+      "refersTo": "card-cartouche",
+      "description": "Ligne du registre des applications connectées avec code ISO entre crochets, télémétrie de port 127.0.0.1 modifiable en direct et cibles de lancement.",
+      "html": "<div class=\"ds-app-card\"><div class=\"ds-app-top\"><div class=\"ds-app-id\"><span class=\"ds-app-code\">[3DS]</span><span class=\"ds-app-name\">Studio 3D Local</span><span class=\"ds-app-alias\">· my://3d</span></div><span class=\"ds-app-status\"><span class=\"ds-status-dot\"></span>ACTIF (2ms)</span></div><div class=\"ds-app-bottom\"><div class=\"ds-app-port\"><span>127.0.0.1:</span><input type=\"number\" class=\"ds-port-input\" value=\"3000\" aria-label=\"Port\" /><span>/</span></div><div class=\"ds-app-actions\"><button type=\"button\" class=\"ds-act-btn\">Onglet</button><button type=\"button\" class=\"ds-act-btn\">Split</button><button type=\"button\" class=\"ds-act-btn\">Sidebar</button></div></div></div>",
+      "css": ".ds-app-card { display: flex; flex-direction: column; gap: 8px; padding: 10px; background-color: var(--iso-panel, #1a1f26); border: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink, #e6edf3); } .ds-app-top, .ds-app-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; } .ds-app-id { display: flex; align-items: center; gap: 6px; } .ds-app-code { font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 700; } .ds-app-name { font-family: 'Archivo', sans-serif; font-size: 12px; font-weight: 600; } .ds-app-alias { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--iso-ink-secondary, #9ba9bb); } .ds-app-status { display: inline-flex; align-items: center; gap: 4px; font-family: 'Azeret Mono', monospace; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--iso-signal, #2ea043); } .ds-status-dot { width: 6px; height: 6px; background-color: var(--iso-signal, #2ea043); } .ds-app-port { display: inline-flex; align-items: center; gap: 4px; font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--iso-ink-secondary, #9ba9bb); } .ds-port-input { width: 68px; padding: 2px 6px; background-color: var(--iso-bg, #121519); border: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink, #e6edf3); font-family: 'Azeret Mono', monospace; font-size: 11px; font-variant-numeric: tabular-nums; } .ds-port-input:focus-visible { outline: 1px solid var(--iso-accent, #ff5a26); outline-offset: -1px; } .ds-app-actions { display: flex; gap: 4px; } .ds-act-btn { padding: 2px 8px; background-color: var(--iso-bg, #121519); border: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink, #e6edf3); font-family: 'Archivo', sans-serif; font-size: 12px; cursor: pointer; } .ds-act-btn:hover { border-color: var(--iso-accent, #ff5a26); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Cartouche d'Atelier ISO",
+    "overview": "MyBrowser est conçu comme une table à dessin d'ingénierie ISO et un banc de pilotage Chromium où chaque vue web, chaque partition de session isolée et chaque port local (`127.0.0.1:port`) est encadré par un cartouche technique continu de `1px`. L'interface s'efface au profit des scènes WebGL2/WebGPU et des applications en développement grâce à une densité d'instrument de précision, sans jamais imposer d'applications tierces préconfigurées en dur.\n\nLe système rejette explicitement le flou glassmorphique décoratif (`backdrop-filter`), les ombres portées diffuses, les rayons d'arrondi mous et les barres d'outils bureautiques grises génériques. Toute la hiérarchie repose sur des aplats mats neutres, une grille de filets continus orthogonaux et une signalétique Rotring où la couleur possède une signification opératoire stricte.",
+    "keyCharacteristics": [
+      "Cartouches techniques continus de 1px (#2a313c) à géométrie strictement orthogonale (0px de rayon).",
+      "Palette ardoise graphite neutre (#121519 et #1a1f26) calibrée pour préserver la colorimétrie des rendus 3D WebGL2/WebGPU.",
+      "Signalétique d'instrument : Vermillon Rotring (#ff5a26) réservé au focus actif et Émeraude Technique (#2ea043) dédiée aux ports 127.0.0.1 en ligne et au bouclier réseau.",
+      "Colonne verticale repliable en tranche technique (« Spine » de 48px) et double cadre Split-View (CADRE A / CADRE B) aligné au pixel près sur une ligne de base de 36px.",
+      "Télémétrie tabulaire (Azeret Mono, tabular-nums) pour les ports TCP, latences, compteurs Adblock et coordonnées 3D."
+    ],
+    "rules": [
+      {
+        "name": "The Rotring Focus Rule",
+        "body": "Le Vermillon Rotring (#ff5a26) signale un unique foyer d'attention actif à la fois : lorsque le CADRE B prend le focus en Split-View, le CADRE A perd son badge et son filet vermillon au profit d'un cartouche neutre (#2a313c).",
+        "section": "colors"
+      },
+      {
+        "name": "The Colorimetric Neutrality Rule",
+        "body": "Les barres et panneaux périphériques restent strictement sur les trois gris ardoise (#121519, #1a1f26, #212730) sans dégradé coloré ni halo lumineux, afin de ne jamais altérer la perception des couleurs dans les scènes WebGL2/WebGPU.",
+        "section": "colors"
+      },
+      {
+        "name": "The Localhost Emerald Rule",
+        "body": "L'Émeraude Technique (#2ea043) ne sert jamais d'accent générique de marque ; elle atteste uniquement qu'un service local répond sur 127.0.0.1, que le filtrage réseau est actif ou que le pipeline matériel GPU est opérationnel.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Telemetry Rule",
+        "body": "Tout compteur, numéro de port, temps de latence (2ms), horodatage ou angle en radians doit être composé en Azeret Mono avec font-variant-numeric: tabular-nums (.tabular-nums) pour interdire tout décalage horizontal lors des rafraîchissements.",
+        "section": "typography"
+      },
+      {
+        "name": "The Bracketed Code Rule",
+        "body": "Les identifiants courts d'applications, de cadres et de scripts sont encadrés de crochets droits en Azeret Mono gras ([A], [B], [3DS], [USR-01]) afin de structurer le balayage visuel sans recourir à des favicons disparates.",
+        "section": "typography"
+      },
+      {
+        "name": "The Structural Hairline Rule",
+        "body": "Toute séparation de zone, de cellule tabulaire ou de composant s'effectue par un filet franc de 1px solid #2a313c (ou gap-px sur fond #2a313c). Les ombres décoratives et le glassmorphisme sont proscrits.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Dimmed Context Rule",
+        "body": "Lorsqu'un tiroir de configuration ou une création d'espace est actif, le rail et l'aire centrale abaissent leur opacité (opacity-60 / opacity-65) et la passerelle Electron signale overlayActive: true aux WebContentsView natives.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do encadrer chaque zone, barre, cellule de télémétrie et carte par un filet continu de 1px solid #2a313c avec un rayon d'arrondi de 0px.",
+      "Do réserver le Vermillon Rotring (#ff5a26) au seul cadre détenant le focus actif (CADRE A ou CADRE B), à l'espace de travail sélectionné et au déclencheur primaire du panneau focalisé.",
+      "Do appliquer Azeret Mono avec tabular-nums sur tous les numéros de ports TCP (:3000, :4577), compteurs de blocage (BLK:14), latences et valeurs angulaires.",
+      "Do maintenir l'alignement horizontal strict des cartouches d'en-tête de 36px (h-9) entre le CADRE A, le CADRE B et le panneau latéral droit.",
+      "Do limiter les formulaires internes à un maximum de 2 colonnes (sm:grid-cols-2) afin que chaque champ reste intégralement lisible en mode Split-View (340px–456px de large)."
+    ],
+    "donts": [
+      "Don't introduire de flou glassmorphique (backdrop-filter), de dégradés atmosphériques ou de teintes colorées dans les panneaux #121519 / #1a1f26 qui fausseraient la colorimétrie des vues 3D.",
+      "Don't appliquer d'arrondis (border-radius > 0) sur les boutons, onglets, badges ou champs de saisie.",
+      "Don't utiliser l'Émeraude Technique (#2ea043) comme couleur décorative en dehors des états réseau actifs (127.0.0.1 en ligne, bouclier Adblock actif, pipeline WebGL2/WebGPU prêt).",
+      "Don't imposer d'applications tierces verrouillées en dur : la liste des applications connectées doit toujours pouvoir être modifiée ou vidée en un clic (Profil vierge)."
+    ]
+  }
+}

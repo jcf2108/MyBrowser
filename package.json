@@ -1,0 +1,74 @@
+{
+  "name": "mybrowser",
+  "version": "0.1.0",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "description": "Navigateur web Chromium personnalisable (Electron WebContentsView) avec onglets verticaux, Split-View, dock d'applications externes à port configurable, bloqueur réseau et agent local.",
+  "main": "dist-electron/main/index.js",
+  "scripts": {
+    "dev:renderer": "vite --host 127.0.0.1 --port 5188",
+    "build:renderer": "vite build",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "build": "npm run build:renderer && npm run build:electron",
+    "start": "npm run build && electron .",
+    "dev": "npm run build:electron && concurrently -k \"npm run dev:renderer\" \"wait-on http://127.0.0.1:5188 && NODE_ENV=development electron .\"",
+    "dist:win": "npm run build && electron-builder --win --x64",
+    "dist:linux": "npm run build && electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.mybrowser.iso",
+    "productName": "MyBrowser",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MyBrowser"
+    }
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource-variable/azeret-mono": "^5.3.0",
+    "lucide-react": "^0.460.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
+    "electron": "^33.2.0",
+    "electron-builder": "^26.18.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "wait-on": "^8.0.1"
+  }
+}
