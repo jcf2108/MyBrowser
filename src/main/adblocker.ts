@@ -129,18 +129,86 @@ export class NetworkShieldEngine {
 
     ses.webRequest.onBeforeSendHeaders((details, callback) => {
       const requestHeaders = { ...details.requestHeaders };
-      requestHeaders['User-Agent'] =
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
-      requestHeaders['sec-ch-ua'] =
-        '"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"';
-      requestHeaders['sec-ch-ua-mobile'] = '?0';
-      requestHeaders['sec-ch-ua-platform'] = '"Windows"';
+      let host = '';
+      try {
+        host = new URL(details.url).hostname.toLowerCase();
+      } catch {
+        // Ignore URL parse error
+      }
+
+      const isGoogleAuth =
+        host === 'accounts.google.com' ||
+        host.endsWith('.accounts.google.com') ||
+        details.url.includes('accounts.google.com');
+
+      const isChromeWebStore =
+        host === 'chromewebstore.google.com' ||
+        host === 'chrome.google.com' ||
+        host === 'clients2.google.com' ||
+        host === 'clients2.googleusercontent.com';
+
+      if (isGoogleAuth) {
+        // Use standard Firefox desktop identity for Google OAuth / Gmail sign-in so Google never blocks embedded Chromium / Electron
+        requestHeaders['User-Agent'] =
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0';
+        for (const key of Object.keys(requestHeaders)) {
+          const lower = key.toLowerCase();
+          if (lower.startsWith('sec-ch-ua') || lower === 'x-client-data') {
+            delete requestHeaders[key];
+          }
+        }
+      } else if (isChromeWebStore) {
+        // Present Chrome 136 to Chrome Web Store so extensions requiring Chrome >= 134 are never marked unavailable
+        requestHeaders['User-Agent'] =
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
+        requestHeaders['sec-ch-ua'] =
+          '"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"';
+        requestHeaders['sec-ch-ua-mobile'] = '?0';
+        requestHeaders['sec-ch-ua-platform'] = '"Windows"';
+      } else {
+        const realChrome = process.versions.chrome || '130.0.6723.116';
+        requestHeaders['User-Agent'] =
+          `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${realChrome} Safari/537.36`;
+      }
 
       if (this.state.enabled && this.state.strictPrivacyHeaders) {
         requestHeaders['DNT'] = '1';
         requestHeaders['Sec-GPC'] = '1';
       }
       return callback({ requestHeaders });
+    });
+
+    ses.webRequest.onHeadersReceived((details, callback) => {
+      if (!details.responseHeaders) {
+        return callback({});
+      }
+      let host = '';
+      try {
+        host = new URL(details.url).hostname.toLowerCase();
+      } catch {
+        // Ignore
+      }
+
+      if (
+        host === 'chromewebstore.google.com' ||
+        host === 'chrome.google.com' ||
+        host === 'accounts.google.com' ||
+        host.endsWith('.accounts.google.com')
+      ) {
+        const responseHeaders = { ...details.responseHeaders };
+        for (const key of Object.keys(responseHeaders)) {
+          const lower = key.toLowerCase();
+          if (
+            lower === 'content-security-policy' ||
+            lower === 'content-security-policy-report-only'
+          ) {
+            delete responseHeaders[key];
+          }
+        }
+        return callback({ responseHeaders });
+      }
+
+      return callback({ responseHeaders: details.responseHeaders });
     });
   }
 }

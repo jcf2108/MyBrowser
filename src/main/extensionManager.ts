@@ -166,6 +166,95 @@ interface ParsedManifestInfo {
   optionsPath: string | null;
 }
 
+const CHROME_EXTENSION_API_SHIM = `/* __MYBROWSER_CHROME_SHIM__ */
+(function() {
+  const g = typeof globalThis !== 'undefined' ? globalThis : self;
+  if (!g.chrome) g.chrome = {};
+  const makeEvent = () => ({
+    addListener() {},
+    removeListener() {},
+    hasListener() { return false; },
+    hasListeners() { return false; }
+  });
+  const makeProxy = (target = {}) => new Proxy(target, {
+    get(obj, prop) {
+      if (prop in obj && obj[prop] !== undefined) return obj[prop];
+      if (prop === 'then' || typeof prop === 'symbol') return undefined;
+      if (typeof prop === 'string' && prop.startsWith('on')) {
+        obj[prop] = makeEvent();
+        return obj[prop];
+      }
+      const fn = function(...args) {
+        const cb = args[args.length - 1];
+        if (typeof cb === 'function') { try { cb({}); } catch {} }
+        return Promise.resolve({});
+      };
+      obj[prop] = makeProxy(fn);
+      return obj[prop];
+    }
+  });
+  const apis = [
+    'contextMenus', 'sidePanel', 'webNavigation', 'notifications', 'privacy',
+    'commands', 'idle', 'action', 'browserAction', 'pageAction', 'permissions',
+    'identity', 'management', 'omnibox', 'tts', 'windows', 'cookies', 'history',
+    'bookmarks', 'scripting', 'offscreen', 'tabGroups', 'declarativeNetRequest'
+  ];
+  for (const api of apis) {
+    try {
+      if (!g.chrome[api]) {
+        g.chrome[api] = makeProxy({});
+      } else {
+        g.chrome[api] = makeProxy(g.chrome[api]);
+      }
+    } catch {}
+  }
+})();
+`;
+
+function patchExtensionForElectronCompatibility(
+  extDir: string,
+  manifest: Record<string, any>,
+  popupPath: string | null,
+  optionsPath: string | null
+): void {
+  try {
+    // 1. Write standalone shim file into extension root for HTML pages (CSP script-src 'self' compliant)
+    const shimFileName = '__mybrowser_chrome_shim.js';
+    const shimFullPath = path.join(extDir, shimFileName);
+    fs.writeFileSync(shimFullPath, CHROME_EXTENSION_API_SHIM, 'utf-8');
+
+    // 2. Prepend shim to background.service_worker if present
+    const swRel = manifest.background?.service_worker;
+    if (typeof swRel === 'string' && swRel.trim()) {
+      const swPath = path.join(extDir, swRel.replace(/^\//, ''));
+      if (fs.existsSync(swPath)) {
+        const swContent = fs.readFileSync(swPath, 'utf-8');
+        if (!swContent.includes('__MYBROWSER_CHROME_SHIM__')) {
+          fs.writeFileSync(swPath, `${CHROME_EXTENSION_API_SHIM}\n${swContent}`, 'utf-8');
+        }
+      }
+    }
+
+    // 3. Inject <script src="/__mybrowser_chrome_shim.js"></script> into popup and options HTML
+    for (const relHtml of [popupPath, optionsPath]) {
+      if (!relHtml) continue;
+      const htmlPath = path.join(extDir, relHtml);
+      if (fs.existsSync(htmlPath)) {
+        const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
+        if (!htmlContent.includes(shimFileName)) {
+          const scriptTag = `<script src="/${shimFileName}"></script>`;
+          const patchedHtml = /<head[^>]*>/i.test(htmlContent)
+            ? htmlContent.replace(/(<head[^>]*>)/i, `$1\n${scriptTag}`)
+            : `${scriptTag}\n${htmlContent}`;
+          fs.writeFileSync(htmlPath, patchedHtml, 'utf-8');
+        }
+      }
+    }
+  } catch {
+    // Ignore if extension directory is read-only
+  }
+}
+
 function readExtensionManifest(extDir: string): ParsedManifestInfo {
   const manifestPath = path.join(extDir, 'manifest.json');
   if (!fs.existsSync(manifestPath)) {
@@ -199,12 +288,17 @@ function readExtensionManifest(extDir: string): ParsedManifestInfo {
 
   const rawOptions = manifest.options_ui?.page || manifest.options_page || null;
 
+  const cleanPopup = rawPopup ? String(rawPopup).replace(/^\//, '') : null;
+  const cleanOptions = rawOptions ? String(rawOptions).replace(/^\//, '') : null;
+
+  patchExtensionForElectronCompatibility(extDir, manifest, cleanPopup, cleanOptions);
+
   return {
     name: rawName,
     version: String(manifest.version || '1.0.0'),
     description: rawDesc,
-    popupPath: rawPopup ? String(rawPopup).replace(/^\//, '') : null,
-    optionsPath: rawOptions ? String(rawOptions).replace(/^\//, '') : null,
+    popupPath: cleanPopup,
+    optionsPath: cleanOptions,
   };
 }
 

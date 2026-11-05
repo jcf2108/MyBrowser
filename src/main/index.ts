@@ -36,11 +36,17 @@ app.commandLine.appendSwitch('enable-unsafe-webgpu');
 app.commandLine.appendSwitch('ignore-gpu-blocklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
 app.commandLine.appendSwitch('enable-zero-copy');
+// Hide navigator.webdriver / AutomationControlled blink flags so Google OAuth & anti-bot checks treat MyBrowser as a standard desktop browser
+app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled');
 
-// Present a clean Chrome 136 User-Agent so Chrome Web Store and web apps never reject extensions with minimum_chrome_version >= 134
-const CLEAN_CHROME_UA =
+const REAL_CHROME_VERSION = process.versions.chrome || '130.0.6723.116';
+const DEFAULT_CHROME_UA = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${REAL_CHROME_VERSION} Safari/537.36`;
+const CWS_CHROME_136_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
-app.userAgentFallback = CLEAN_CHROME_UA;
+const GOOGLE_AUTH_FIREFOX_UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0';
+
+app.userAgentFallback = DEFAULT_CHROME_UA;
 
 class MyBrowserKernel {
   private mainWindow: BrowserWindow | null = null;
@@ -190,7 +196,7 @@ class MyBrowserKernel {
 
   private ensureWorkspaceSession(ws: Workspace) {
     const ses = session.fromPartition(ws.partition);
-    ses.setUserAgent(CLEAN_CHROME_UA);
+    ses.setUserAgent(DEFAULT_CHROME_UA);
     this.shield.attachToSession(ws.partition, ws.id, ses, () => {
       const active = this.tabs.find((t) => t.id === this.activeTabId);
       if (active) {
@@ -199,6 +205,21 @@ class MyBrowserKernel {
     });
     this.extensionManager.attachExtensionsToSession(ses).catch(() => {});
     return ses;
+  }
+
+  private applyUserAgentForUrl(webContents: Electron.WebContents, rawUrl: string): void {
+    try {
+      const host = new URL(rawUrl).hostname.toLowerCase();
+      if (host === 'accounts.google.com' || host.endsWith('.accounts.google.com')) {
+        webContents.setUserAgent(GOOGLE_AUTH_FIREFOX_UA);
+      } else if (host === 'chromewebstore.google.com' || host === 'chrome.google.com') {
+        webContents.setUserAgent(CWS_CHROME_136_UA);
+      } else {
+        webContents.setUserAgent(DEFAULT_CHROME_UA);
+      }
+    } catch {
+      webContents.setUserAgent(DEFAULT_CHROME_UA);
+    }
   }
 
   private resolveUrlAndSecurity(rawInput: string): { url: string; securityState: SecurityState } {
@@ -368,13 +389,29 @@ class MyBrowserKernel {
 
     const view = new WebContentsView({
       webPreferences: {
+        preload: path.join(__dirname, '../preload/tabPreload.js'),
         session: ses,
         contextIsolation: true,
-        sandbox: true,
+        nodeIntegration: false,
+        sandbox: false,
       },
     });
 
-    view.webContents.setUserAgent(CLEAN_CHROME_UA);
+    this.applyUserAgentForUrl(view.webContents, tab.url);
+
+    view.webContents.on('will-navigate', (_e, url) => {
+      this.applyUserAgentForUrl(view.webContents, url);
+    });
+
+    view.webContents.on('will-redirect', (_e, url) => {
+      this.applyUserAgentForUrl(view.webContents, url);
+    });
+
+    view.webContents.on('did-start-navigation', (_e, url, _isInPlace, isMainFrame) => {
+      if (isMainFrame) {
+        this.applyUserAgentForUrl(view.webContents, url);
+      }
+    });
 
     view.webContents.on('did-start-loading', () => {
       tab.isLoading = true;
@@ -596,6 +633,7 @@ class MyBrowserKernel {
 
     if (!resolved.url.startsWith('my://')) {
       const view = this.getOrCreateWebContentsView(tab);
+      this.applyUserAgentForUrl(view.webContents, resolved.url);
       view.webContents.loadURL(resolved.url).catch(() => {});
     }
 
