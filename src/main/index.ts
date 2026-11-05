@@ -29,6 +29,7 @@ import {
 import { NetworkShieldEngine } from './adblocker';
 import { LocalEcosystemBridge, probeLocalPort } from './localBridge';
 import { ExtensionManager, extractCwsExtensionId } from './extensionManager';
+import { UpdateManager } from './updateManager';
 
 // Enable Chromium Hardware Acceleration, WebGL2 and WebGPU for 3D apps
 app.commandLine.appendSwitch('enable-unsafe-webgpu');
@@ -66,6 +67,7 @@ class MyBrowserKernel {
   private shield: NetworkShieldEngine;
   private bridge: LocalEcosystemBridge;
   private extensionManager: ExtensionManager;
+  private updateManager: UpdateManager;
   private currentBounds: ViewportBoundsPayload = {
     primary: null,
     secondary: null,
@@ -99,6 +101,7 @@ class MyBrowserKernel {
       },
       onStateChanged: () => this.broadcastState(),
     });
+    this.updateManager = new UpdateManager(() => this.broadcastState());
   }
 
   private loadPersistedConfig(): void {
@@ -178,6 +181,11 @@ class MyBrowserKernel {
 
     this.bridge.start();
     this.probeAllPorts();
+
+    // Check for GitHub Release updates 3 seconds after window startup
+    setTimeout(() => {
+      this.updateManager.checkForUpdates(false).catch(() => {});
+    }, 3000);
   }
 
   private ensureWorkspaceSession(ws: Workspace) {
@@ -490,6 +498,7 @@ class MyBrowserKernel {
       extensions: this.extensionManager.getExtensions(),
       extensionInstalling: this.extensionManager.isInstalling(),
       extensionStatusMessage: this.extensionManager.getStatusMessage(),
+      updater: this.updateManager.getState(),
     };
   }
 
@@ -1123,6 +1132,16 @@ class MyBrowserKernel {
       this.extensionManager.openExtensionPopup(extId, this.mainWindow, (u) =>
         this.createTab(u, this.activeWorkspaceId, false)
       );
+      return this.getSnapshot();
+    });
+
+    ipcMain.handle('browser:check-for-updates', async () => {
+      await this.updateManager.checkForUpdates(true);
+      return this.getSnapshot();
+    });
+
+    ipcMain.handle('browser:apply-update', async () => {
+      await this.updateManager.applyOrDownloadUpdate();
       return this.getSnapshot();
     });
   }

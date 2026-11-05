@@ -34,20 +34,28 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Read version from package.json
+        id: pkg
+        shell: bash
+        run: echo "version=v$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
       - name: Upload Windows .exe Artifacts (Installateur + Portable)
         uses: actions/upload-artifact@v7
         with:
           name: MyBrowser-Windows-x64
           path: |
             release/*.exe
+            release/*.blockmap
             release/latest.yml
           retention-days: 30
 
-      - name: Publish GitHub Release (on tag v* or manual dispatch)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Publish GitHub Release for Auto-Updater
         uses: softprops/action-gh-release@v3
         with:
+          tag_name: ${{ steps.pkg.outputs.version }}
+          name: MyBrowser ${{ steps.pkg.outputs.version }} (Windows x64)
           files: |
             release/*.exe
+            release/*.blockmap
             release/latest.yml
           generate_release_notes: true

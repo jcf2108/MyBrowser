@@ -72,6 +72,10 @@ const api = {
   installExtensionFromFolder: () => ipcRenderer.invoke('browser:install-extension-folder'),
   removeExtension: (extId: string) => ipcRenderer.invoke('browser:remove-extension', extId),
   openExtensionPopup: (extId: string) => ipcRenderer.invoke('browser:open-extension-popup', extId),
+
+  // Automatic Updates (GitHub Releases & electron-updater)
+  checkForUpdates: () => ipcRenderer.invoke('browser:check-for-updates'),
+  applyUpdate: () => ipcRenderer.invoke('browser:apply-update'),
 };
 
 contextBridge.exposeInMainWorld('myBrowser', api);

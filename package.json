@@ -1,6 +1,6 @@
 {
   "name": "mybrowser",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "PolyForm-Noncommercial-1.0.0",
   "description": "Navigateur web Chromium personnalisable (Electron WebContentsView) avec onglets verticaux, Split-View, dock d'applications externes à port configurable, bloqueur réseau et agent local.",
   "main": "dist-electron/main/index.js",
@@ -11,12 +11,20 @@
     "build": "npm run build:renderer && npm run build:electron",
     "start": "npm run build && electron .",
     "dev": "npm run build:electron && concurrently -k \"npm run dev:renderer\" \"wait-on http://127.0.0.1:5188 && NODE_ENV=development electron .\"",
-    "dist:win": "npm run build && electron-builder --win --x64",
+    "dist:win": "npm run build && electron-builder --win --x64 --publish never",
     "dist:linux": "npm run build && electron-builder --linux"
   },
   "build": {
     "appId": "com.mybrowser.iso",
     "productName": "MyBrowser",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "jcf2108",
+        "repo": "MyBrowser",
+        "releaseType": "release"
+      }
+    ],
     "directories": {
       "output": "release"
     },
@@ -26,6 +34,7 @@
       "package.json"
     ],
     "win": {
+      "verifyUpdateCodeSignature": false,
       "target": [
         {
           "target": "nsis",
@@ -53,6 +62,7 @@
     "@fontsource-variable/archivo": "^5.3.0",
     "@fontsource-variable/azeret-mono": "^5.3.0",
     "adm-zip": "^0.6.1",
+    "electron-updater": "^6.8.11",
     "lucide-react": "^0.460.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

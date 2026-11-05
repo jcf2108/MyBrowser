@@ -63,6 +63,8 @@ declare global {
       installExtensionFromFolder: () => Promise<BrowserStateSnapshot>;
       removeExtension: (extId: string) => Promise<BrowserStateSnapshot>;
       openExtensionPopup: (extId: string) => Promise<BrowserStateSnapshot>;
+      checkForUpdates: () => Promise<BrowserStateSnapshot>;
+      applyUpdate: () => Promise<BrowserStateSnapshot>;
     };
   }
 }
@@ -202,6 +204,15 @@ function buildInitialState(): BrowserStateSnapshot {
     extensions: [],
     extensionInstalling: false,
     extensionStatusMessage: null,
+    updater: {
+      currentVersion: '0.1.2',
+      latestVersion: '0.1.2',
+      status: 'up-to-date',
+      progressPercent: 0,
+      releaseUrl: 'https://github.com/jcf2108/MyBrowser/releases',
+      downloadUrl: null,
+      message: 'MyBrowser v0.1.2 est à jour.',
+    },
   };
 }
 
@@ -895,6 +906,20 @@ export function useBrowserStore() {
     }
   }, []);
 
+  const checkForUpdates = useCallback(async () => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.checkForUpdates());
+      return;
+    }
+  }, []);
+
+  const applyUpdate = useCallback(async () => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.applyUpdate());
+      return;
+    }
+  }, []);
+
   const updateViewportBounds = useCallback((bounds: ViewportBoundsPayload) => {
     if (window.myBrowser) {
       window.myBrowser.updateViewportBounds(bounds);
@@ -935,6 +960,8 @@ export function useBrowserStore() {
       installExtensionFromFolder,
       removeExtension,
       openExtensionPopup,
+      checkForUpdates,
+      applyUpdate,
       updateViewportBounds,
     },
   };

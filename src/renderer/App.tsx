@@ -327,8 +327,31 @@ export const App: React.FC = () => {
           </button>
         </form>
 
-        {/* Right Controls: Installed Extensions, Split-View A|B, Shield, Bridge & Right Panel */}
+        {/* Right Controls: Auto-Updater, Installed Extensions, Split-View A|B, Shield, Bridge & Right Panel */}
         <div className="flex items-center gap-1 shrink-0 text-[11px]">
+          {(state.updater.status === 'available' ||
+            state.updater.status === 'downloading' ||
+            state.updater.status === 'downloaded') && (
+            <button
+              type="button"
+              onClick={() => actions.applyUpdate()}
+              disabled={state.updater.status === 'downloading'}
+              className="h-7 px-2.5 border border-iso-accent bg-iso-accent text-[#0d1014] hover:bg-iso-accentHover inline-flex items-center gap-1 font-mono font-bold tabular-nums"
+              title={
+                state.updater.message ||
+                `Télécharger et installer la mise à jour v${state.updater.latestVersion}`
+              }
+            >
+              {state.updater.status === 'downloading' ? (
+                <span>MAJ {state.updater.progressPercent}%</span>
+              ) : state.updater.status === 'downloaded' ? (
+                <span>REDÉMARRER (v{state.updater.latestVersion})</span>
+              ) : (
+                <span>MAJ v{state.updater.latestVersion}</span>
+              )}
+            </button>
+          )}
+
           {/* Installed Chrome Extension Action Badges (e.g. Bitwarden Popup) */}
           {state.extensions.map((ext) => (
             <button
@@ -813,10 +836,36 @@ export const App: React.FC = () => {
           {/* Bottom Technical Cartouche Stamp */}
           <div className="px-2 py-1.5 border-t border-iso-line bg-iso-bg font-mono text-[10px] text-iso-inkSecondary flex items-center justify-between">
             {effectiveSpineCollapsed ? (
-              <span className="mx-auto text-iso-signal">ISO</span>
+              <button
+                type="button"
+                onClick={() => actions.checkForUpdates()}
+                className="mx-auto text-iso-signal hover:text-iso-ink"
+                title={`MyBrowser v${state.updater.currentVersion} — Cliquer pour vérifier les mises à jour`}
+              >
+                ISO
+              </button>
             ) : (
               <>
-                <span>CHROMIUM {state.chromiumVersion.split('.')[0]}</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    state.updater.status === 'available' || state.updater.status === 'downloaded'
+                      ? actions.applyUpdate()
+                      : actions.checkForUpdates()
+                  }
+                  className="hover:text-iso-ink text-left truncate"
+                  title={
+                    state.updater.message ||
+                    'Cliquer pour vérifier les mises à jour sur GitHub Releases'
+                  }
+                >
+                  v{state.updater.currentVersion} ·{' '}
+                  {state.updater.status === 'checking'
+                    ? 'VÉRIF…'
+                    : state.updater.status === 'available' || state.updater.status === 'downloaded'
+                    ? `MAJ v${state.updater.latestVersion}`
+                    : 'MAJ AUTO'}
+                </button>
                 <span className="text-iso-signal">127.0.0.1:{state.bridge.port}</span>
               </>
             )}

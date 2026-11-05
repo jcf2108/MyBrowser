@@ -145,6 +145,25 @@ export interface ViewportBoundsPayload {
   overlayActive: boolean;
 }
 
+export type UpdateStatus =
+  | 'idle'
+  | 'checking'
+  | 'available'
+  | 'downloading'
+  | 'downloaded'
+  | 'up-to-date'
+  | 'error';
+
+export interface AppUpdateState {
+  currentVersion: string;
+  latestVersion: string | null;
+  status: UpdateStatus;
+  progressPercent: number;
+  releaseUrl: string | null;
+  downloadUrl: string | null;
+  message: string | null;
+}
+
 export interface BrowserStateSnapshot {
   isElectronNative: boolean;
   chromiumVersion: string;
@@ -170,4 +189,5 @@ export interface BrowserStateSnapshot {
   extensions: InstalledExtension[];
   extensionInstalling: boolean;
   extensionStatusMessage: string | null;
+  updater: AppUpdateState;
 }
