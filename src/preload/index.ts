@@ -65,6 +65,13 @@ const api = {
   saveUserScript: (recipe: Partial<UserScriptRecipe>) => ipcRenderer.invoke('browser:save-userscript', recipe),
   deleteUserScript: (scriptId: string) => ipcRenderer.invoke('browser:delete-userscript', scriptId),
   rotateBridgeToken: () => ipcRenderer.invoke('browser:rotate-bridge-token'),
+
+  // Chrome Extensions (Chrome Web Store .crx & Local Unpacked)
+  installExtensionFromCws: (urlOrId: string) =>
+    ipcRenderer.invoke('browser:install-extension-cws', urlOrId),
+  installExtensionFromFolder: () => ipcRenderer.invoke('browser:install-extension-folder'),
+  removeExtension: (extId: string) => ipcRenderer.invoke('browser:remove-extension', extId),
+  openExtensionPopup: (extId: string) => ipcRenderer.invoke('browser:open-extension-popup', extId),
 };
 
 contextBridge.exposeInMainWorld('myBrowser', api);

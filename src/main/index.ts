@@ -28,12 +28,18 @@ import {
 } from '../shared/defaults';
 import { NetworkShieldEngine } from './adblocker';
 import { LocalEcosystemBridge, probeLocalPort } from './localBridge';
+import { ExtensionManager, extractCwsExtensionId } from './extensionManager';
 
 // Enable Chromium Hardware Acceleration, WebGL2 and WebGPU for 3D apps
 app.commandLine.appendSwitch('enable-unsafe-webgpu');
 app.commandLine.appendSwitch('ignore-gpu-blocklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
 app.commandLine.appendSwitch('enable-zero-copy');
+
+// Present a clean standard Chrome User-Agent so Chrome Web Store and web apps do not block Electron
+const CHROME_VERSION = process.versions.chrome || '130.0.6723.116';
+const CLEAN_CHROME_UA = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${CHROME_VERSION} Safari/537.36`;
+app.userAgentFallback = CLEAN_CHROME_UA;
 
 class MyBrowserKernel {
   private mainWindow: BrowserWindow | null = null;
@@ -59,6 +65,7 @@ class MyBrowserKernel {
 
   private shield: NetworkShieldEngine;
   private bridge: LocalEcosystemBridge;
+  private extensionManager: ExtensionManager;
   private currentBounds: ViewportBoundsPayload = {
     primary: null,
     secondary: null,
@@ -83,6 +90,15 @@ class MyBrowserKernel {
       },
       4577
     );
+    this.extensionManager = new ExtensionManager({
+      getSessions: () => this.workspaces.map((ws) => session.fromPartition(ws.partition)),
+      getActiveSession: () => {
+        const activeWs =
+          this.workspaces.find((w) => w.id === this.activeWorkspaceId) || this.workspaces[0];
+        return session.fromPartition(activeWs.partition);
+      },
+      onStateChanged: () => this.broadcastState(),
+    });
   }
 
   private loadPersistedConfig(): void {
@@ -146,6 +162,8 @@ class MyBrowserKernel {
       this.ensureWorkspaceSession(ws);
     }
 
+    this.extensionManager.loadInstalledExtensionsOnStartup().catch(() => {});
+
     const isDev = process.env.NODE_ENV === 'development';
     if (isDev) {
       this.mainWindow.loadURL('http://127.0.0.1:5188');
@@ -164,12 +182,14 @@ class MyBrowserKernel {
 
   private ensureWorkspaceSession(ws: Workspace) {
     const ses = session.fromPartition(ws.partition);
+    ses.setUserAgent(CLEAN_CHROME_UA);
     this.shield.attachToSession(ws.partition, ws.id, ses, () => {
       const active = this.tabs.find((t) => t.id === this.activeTabId);
       if (active) {
         active.blockedCount += 1;
       }
     });
+    this.extensionManager.attachExtensionsToSession(ses).catch(() => {});
     return ses;
   }
 
@@ -184,6 +204,10 @@ class MyBrowserKernel {
         return this.resolveUrlAndSecurity(computed);
       }
       return { url: trimmed, securityState: 'internal' };
+    }
+
+    if (/^chrome-extension:\/\//i.test(trimmed)) {
+      return { url: trimmed, securityState: 'secure' };
     }
 
     if (/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i.test(trimmed)) {
@@ -212,6 +236,106 @@ class MyBrowserKernel {
     };
   }
 
+  private injectChromeWebStoreEnhancer(view: WebContentsView, currentUrl: string): void {
+    if (
+      !/chromewebstore\.google\.com/i.test(currentUrl) &&
+      !/chrome\.google\.com\/webstore/i.test(currentUrl)
+    ) {
+      return;
+    }
+
+    view.webContents
+      .executeJavaScript(`(() => {
+        if (window.__mybrowser_cws_hooked__) return;
+        window.__mybrowser_cws_hooked__ = true;
+
+        const enhanceCwsPage = () => {
+          // 1. Hide "Switch to Chrome" / "Passez à Chrome" banner if displayed
+          document.querySelectorAll('div, section, aside').forEach((el) => {
+            const txt = (el.textContent || '').trim();
+            if (
+              (txt.includes('Passez à Chrome pour installer') ||
+                txt.includes('Switch to Chrome to install')) &&
+              el.clientHeight > 20 &&
+              el.clientHeight < 140
+            ) {
+              el.style.display = 'none';
+            }
+          });
+
+          // 2. Enable and hook the native "Ajouter à Google Chrome" / "Add to Chrome" button
+          document.querySelectorAll('button').forEach((btn) => {
+            const label = (btn.textContent || '').trim();
+            if (
+              /Ajouter à Google Chrome|Add to Chrome|Installer|Ajouter à Chrome/i.test(label)
+            ) {
+              btn.removeAttribute('disabled');
+              btn.removeAttribute('aria-disabled');
+              btn.style.pointerEvents = 'auto';
+              btn.style.cursor = 'pointer';
+              btn.style.opacity = '1';
+              btn.style.backgroundColor = '#ff5a26';
+              btn.style.color = '#0d1014';
+              btn.style.fontWeight = '700';
+              if (!btn.dataset.mybrowserHooked) {
+                btn.dataset.mybrowserHooked = '1';
+                btn.textContent = 'Installer dans MyBrowser';
+                btn.addEventListener(
+                  'click',
+                  (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    btn.textContent = 'Installation CRX en cours...';
+                    console.log('__MYBROWSER_INSTALL_EXT__:' + location.href);
+                  },
+                  true
+                );
+              }
+            }
+          });
+
+          // 3. Inject a floating ISO action pill on any /detail/ extension page
+          const isDetailPage = /\\/detail\\//i.test(location.pathname);
+          let floatingBtn = document.getElementById('__mybrowser_cws_install_pill__');
+          if (isDetailPage) {
+            if (!floatingBtn) {
+              floatingBtn = document.createElement('button');
+              floatingBtn.id = '__mybrowser_cws_install_pill__';
+              floatingBtn.type = 'button';
+              floatingBtn.textContent = '+ INSTALLER DANS MYBROWSER (.CRX)';
+              Object.assign(floatingBtn.style, {
+                position: 'fixed',
+                bottom: '20px',
+                right: '20px',
+                zIndex: '2147483647',
+                backgroundColor: '#ff5a26',
+                color: '#0d1014',
+                border: '1px solid #0d1014',
+                padding: '10px 16px',
+                fontFamily: 'monospace',
+                fontSize: '12px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.45)',
+              });
+              floatingBtn.addEventListener('click', () => {
+                floatingBtn.textContent = 'TÉLÉCHARGEMENT CRX EN COURS...';
+                console.log('__MYBROWSER_INSTALL_EXT__:' + location.href);
+              });
+              document.body.appendChild(floatingBtn);
+            }
+          } else if (floatingBtn) {
+            floatingBtn.remove();
+          }
+        };
+
+        enhanceCwsPage();
+        const obs = new MutationObserver(() => enhanceCwsPage());
+        obs.observe(document.documentElement, { childList: true, subtree: true });
+      })()`)
+      .catch(() => {});
+  }
+
   private getOrCreateWebContentsView(tab: BrowserTab): WebContentsView {
     const existing = this.views.get(tab.id);
     if (existing) return existing;
@@ -227,6 +351,8 @@ class MyBrowserKernel {
       },
     });
 
+    view.webContents.setUserAgent(CLEAN_CHROME_UA);
+
     view.webContents.on('did-start-loading', () => {
       tab.isLoading = true;
       this.broadcastState();
@@ -237,6 +363,7 @@ class MyBrowserKernel {
       tab.canGoBack = view.webContents.navigationHistory.canGoBack();
       tab.canGoForward = view.webContents.navigationHistory.canGoForward();
       tab.title = view.webContents.getTitle() || tab.url;
+      this.injectChromeWebStoreEnhancer(view, view.webContents.getURL());
       this.broadcastState();
     });
 
@@ -251,10 +378,39 @@ class MyBrowserKernel {
       tab.securityState = resolved.securityState;
       tab.canGoBack = view.webContents.navigationHistory.canGoBack();
       tab.canGoForward = view.webContents.navigationHistory.canGoForward();
+      this.injectChromeWebStoreEnhancer(view, url);
       this.broadcastState();
     });
 
+    view.webContents.on('did-navigate-in-page', (_e, url) => {
+      const resolved = this.resolveUrlAndSecurity(url);
+      tab.url = resolved.url;
+      tab.securityState = resolved.securityState;
+      tab.canGoBack = view.webContents.navigationHistory.canGoBack();
+      tab.canGoForward = view.webContents.navigationHistory.canGoForward();
+      this.injectChromeWebStoreEnhancer(view, url);
+      this.broadcastState();
+    });
+
+    view.webContents.on('console-message', (_event, _level, message) => {
+      if (typeof message === 'string' && message.startsWith('__MYBROWSER_INSTALL_EXT__:')) {
+        const targetUrl = message.replace('__MYBROWSER_INSTALL_EXT__:', '').trim();
+        this.extensionManager.installFromWebStore(targetUrl).then((installed) => {
+          if (installed && installed.popupPath) {
+            this.extensionManager.openExtensionPopup(installed.id, this.mainWindow, (u) =>
+              this.createTab(u, tab.workspaceId, false)
+            );
+          }
+        });
+      }
+    });
+
     view.webContents.setWindowOpenHandler(({ url }) => {
+      const cwsId = extractCwsExtensionId(url);
+      if (cwsId && /clients2\.google\.com\/service\/update2\/crx/i.test(url)) {
+        this.extensionManager.installFromWebStore(cwsId);
+        return { action: 'deny' };
+      }
       this.createTab(url, tab.workspaceId, false);
       return { action: 'deny' };
     });
@@ -331,6 +487,9 @@ class MyBrowserKernel {
       scripts: this.scripts,
       lastExtraction: this.lastExtraction,
       bridge: this.bridge.getState(),
+      extensions: this.extensionManager.getExtensions(),
+      extensionInstalling: this.extensionManager.isInstalling(),
+      extensionStatusMessage: this.extensionManager.getStatusMessage(),
     };
   }
 
@@ -381,6 +540,7 @@ class MyBrowserKernel {
   private inferInitialTitle(url: string): string {
     if (url === 'my://start') return 'Planche de Pilotage ISO — MyBrowser';
     if (url === 'my://apps') return 'Favoris d’Applications & Ports Locaux';
+    if (url === 'my://extensions') return 'Extensions Chrome & Paquets CRX';
     if (url === 'my://agent') return 'Agent DOM, Diagnostic 3D & Pont 127.0.0.1';
     if (url === 'my://privacy') return 'Bouclier Réseau & Partitions Chromium';
     if (url === 'my://3d-lab') return 'Banc d’Essai WebGL2 / Shaders Temps Réel';
@@ -931,6 +1091,38 @@ class MyBrowserKernel {
 
     ipcMain.handle('browser:rotate-bridge-token', () => {
       this.bridge.regenerateToken();
+      return this.getSnapshot();
+    });
+
+    ipcMain.handle('browser:install-extension-cws', async (_e, urlOrId: string) => {
+      const installed = await this.extensionManager.installFromWebStore(urlOrId);
+      if (installed && installed.popupPath) {
+        this.extensionManager.openExtensionPopup(installed.id, this.mainWindow, (u) =>
+          this.createTab(u, this.activeWorkspaceId, false)
+        );
+      }
+      return this.getSnapshot();
+    });
+
+    ipcMain.handle('browser:install-extension-folder', async () => {
+      const installed = await this.extensionManager.installFromLocalDirectory(this.mainWindow);
+      if (installed && installed.popupPath) {
+        this.extensionManager.openExtensionPopup(installed.id, this.mainWindow, (u) =>
+          this.createTab(u, this.activeWorkspaceId, false)
+        );
+      }
+      return this.getSnapshot();
+    });
+
+    ipcMain.handle('browser:remove-extension', async (_e, extId: string) => {
+      await this.extensionManager.removeExtension(extId);
+      return this.getSnapshot();
+    });
+
+    ipcMain.handle('browser:open-extension-popup', (_e, extId: string) => {
+      this.extensionManager.openExtensionPopup(extId, this.mainWindow, (u) =>
+        this.createTab(u, this.activeWorkspaceId, false)
+      );
       return this.getSnapshot();
     });
   }

@@ -112,6 +112,21 @@ export interface BridgeLogEntry {
   summary: string;
 }
 
+export interface InstalledExtension {
+  id: string;
+  cwsId: string;
+  runtimeId: string;
+  code: string;
+  name: string;
+  version: string;
+  description: string;
+  popupPath: string | null;
+  optionsPath: string | null;
+  installPath: string;
+  enabled: boolean;
+  installedAt: string;
+}
+
 export interface LocalBridgeState {
   running: boolean;
   host: '127.0.0.1';
@@ -152,4 +167,7 @@ export interface BrowserStateSnapshot {
   scripts: UserScriptRecipe[];
   lastExtraction: AgentExtractionResult | null;
   bridge: LocalBridgeState;
+  extensions: InstalledExtension[];
+  extensionInstalling: boolean;
+  extensionStatusMessage: string | null;
 }

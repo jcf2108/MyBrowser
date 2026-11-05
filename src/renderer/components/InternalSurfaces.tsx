@@ -17,6 +17,7 @@ import {
   Copy,
   Check,
   Server,
+  Puzzle,
 } from 'lucide-react';
 
 interface InternalSurfaceProps {
@@ -45,6 +46,10 @@ interface InternalSurfaceProps {
     saveUserScript: (recipe: Partial<UserScriptRecipe>) => void;
     deleteUserScript: (scriptId: string) => void;
     rotateBridgeToken: () => void;
+    installExtensionFromCws: (urlOrId: string) => void;
+    installExtensionFromFolder: () => void;
+    removeExtension: (extId: string) => void;
+    openExtensionPopup: (extId: string) => void;
     selectWorkspace: (id: string) => void;
     createWorkspace: (p: { name: string; code: string; description: string }) => void;
   };
@@ -63,6 +68,18 @@ export const InternalSurfaceView: React.FC<InternalSurfaceProps> = ({
   if (url === 'my://apps') {
     return (
       <AppsRegistrySurface
+        tab={tab}
+        state={state}
+        isFocusedPane={isFocusedPane}
+        actions={actions}
+        onOpenAddAppModal={onOpenAddAppModal}
+      />
+    );
+  }
+
+  if (url === 'my://extensions') {
+    return (
+      <ExtensionsManagerSurface
         tab={tab}
         state={state}
         isFocusedPane={isFocusedPane}
@@ -186,6 +203,14 @@ const StartDraftingTableSurface: React.FC<InternalSurfaceProps> = ({
             >
               <Server className="w-3.5 h-3.5" />
               <span>Registre des ports</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => actions.navigate('my://extensions', tab.id)}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-iso-line bg-iso-bg text-iso-ink hover:border-iso-accent iso-transition"
+            >
+              <Puzzle className="w-3.5 h-3.5" />
+              <span>Extensions Chrome ({state.extensions.length})</span>
             </button>
             <button
               type="button"
@@ -1131,6 +1156,262 @@ const ExternalViewportSurface: React.FC<InternalSurfaceProps> = ({
           />
         </div>
       )}
+    </div>
+  );
+};
+
+/* ============================================================================
+ * 7. my://extensions — GESTIONNAIRE D'EXTENSIONS CHROME (.CRX & DOSSIERS LOCAUX)
+ * ============================================================================ */
+const RECOMMENDED_CWS_EXTENSIONS = [
+  {
+    id: 'nngceckbapebfimnlniiiahkandclblb',
+    code: 'BIT',
+    name: 'Gestionnaire de mots de passe Bitwarden',
+    description: 'Coffre-fort de mots de passe et remplissage automatique chiffré de bout en bout.',
+  },
+  {
+    id: 'fmkadmapgofadopljbjfkapdkoienihi',
+    code: 'RCT',
+    name: 'React Developer Tools',
+    description: 'Inspection de la hiérarchie de composants React, props, hooks et performances.',
+  },
+  {
+    id: 'nhdogjmejiglipccpnnnanhbledajbpd',
+    code: 'VUE',
+    name: 'Vue.js devtools',
+    description: 'Inspecteur d’état et de composants pour les applications Vue 3.',
+  },
+  {
+    id: 'gbmdgpbipfallnflgajpaliibnhdgobh',
+    code: 'JSN',
+    name: 'JSON Viewer',
+    description: 'Formatage et coloration syntaxique des réponses JSON et API locales.',
+  },
+];
+
+const ExtensionsManagerSurface: React.FC<InternalSurfaceProps> = ({
+  tab,
+  state,
+  isFocusedPane = true,
+  actions,
+}) => {
+  const [cwsInput, setCwsInput] = useState('');
+
+  const handleInstallSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cwsInput.trim()) return;
+    actions.installExtensionFromCws(cwsInput.trim());
+    setCwsInput('');
+  };
+
+  return (
+    <div className="h-full overflow-y-auto bg-iso-bg text-iso-ink p-3.5 space-y-3.5">
+      {/* Header Block */}
+      <div className="border border-iso-line bg-iso-panel p-3.5 space-y-2.5">
+        <h1 className="text-lg font-bold text-iso-ink leading-snug">
+          Extensions Chrome &amp; Téléchargeur Direct Chrome Web Store (.CRX)
+        </h1>
+        <p className="text-xs text-iso-inkSecondary leading-relaxed max-w-[70ch]">
+          MyBrowser télécharge, décompresse et active directement les paquets <code className="font-mono">.crx</code> du
+          Chrome Web Store dans vos partitions Chromium isolées. Vous pouvez installer une extension en
+          1 clic depuis le Chrome Web Store, coller son URL/ID ci-dessous, ou charger un dossier local.
+        </p>
+        <div className="flex flex-wrap items-center gap-2 pt-0.5 font-sans text-xs">
+          <button
+            type="button"
+            onClick={() =>
+              actions.navigate('https://chromewebstore.google.com/category/extensions', tab.id)
+            }
+            className={`px-3 py-1.5 font-semibold ${
+              isFocusedPane
+                ? 'bg-iso-accent text-[#0d1014] hover:bg-iso-accentHover'
+                : 'border border-iso-lineStrong bg-iso-elevated text-iso-ink hover:border-iso-accent'
+            }`}
+          >
+            Ouvrir le Chrome Web Store
+          </button>
+          <button
+            type="button"
+            onClick={() => actions.installExtensionFromFolder()}
+            className="px-2.5 py-1.5 border border-iso-line bg-iso-bg text-iso-ink hover:border-iso-accent"
+          >
+            + Charger un dossier local (manifest.json)
+          </button>
+        </div>
+      </div>
+
+      {/* Status Banner */}
+      {(state.extensionInstalling || state.extensionStatusMessage) && (
+        <div className="border border-iso-lineStrong bg-iso-elevated px-3.5 py-2.5 text-xs flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span
+              className={`w-2 h-2 shrink-0 ${
+                state.extensionInstalling ? 'bg-iso-accent' : 'bg-iso-signal'
+              }`}
+            />
+            <span className="text-iso-ink font-medium">
+              {state.extensionStatusMessage || 'Installation en cours…'}
+            </span>
+          </div>
+          {state.extensionInstalling && (
+            <span className="font-mono text-[11px] text-iso-inkSecondary">CRX3 // UNPACK</span>
+          )}
+        </div>
+      )}
+
+      {/* Direct CWS URL / 32-char ID Installer Form */}
+      <form onSubmit={handleInstallSubmit} className="border border-iso-line bg-iso-panel">
+        <div className="p-3 border-b border-iso-line">
+          <h2 className="text-sm font-bold text-iso-ink">
+            Installer par URL Chrome Web Store ou Identifiant (32 caractères)
+          </h2>
+        </div>
+        <div className="p-3 flex flex-col sm:flex-row gap-2 text-xs">
+          <input
+            type="text"
+            value={cwsInput}
+            onChange={(e) => setCwsInput(e.target.value)}
+            placeholder="https://chromewebstore.google.com/detail/... ou nngceckbapebfimnlniiiahkandclblb"
+            className="min-w-0 flex-1 px-2.5 py-1.5 bg-iso-bg border border-iso-line text-iso-ink font-mono text-xs"
+          />
+          <button
+            type="submit"
+            disabled={state.extensionInstalling}
+            className="px-3.5 py-1.5 border border-iso-lineStrong bg-iso-elevated text-iso-ink font-semibold font-sans hover:border-iso-accent shrink-0"
+          >
+            {state.extensionInstalling ? 'Installation…' : '+ Installer (.CRX)'}
+          </button>
+        </div>
+      </form>
+
+      {/* 1-Click Quick Install Catalog (Bitwarden, React DevTools, etc.) */}
+      <section className="border border-iso-line bg-iso-panel">
+        <div className="px-3 py-2.5 border-b border-iso-line">
+          <h2 className="text-sm font-bold text-iso-ink">
+            Installation Rapide en 1 Clic (Catalogue Vérifié)
+          </h2>
+          <p className="text-[11px] text-iso-inkSecondary">
+            Cliquez sur « Installer » pour télécharger et activer immédiatement l’extension officielle.
+          </p>
+        </div>
+        <div className="divide-y divide-iso-line">
+          {RECOMMENDED_CWS_EXTENSIONS.map((item) => {
+            const alreadyInstalled = state.extensions.some(
+              (e) => e.cwsId === item.id || e.id === item.id
+            );
+            return (
+              <div
+                key={item.id}
+                className="p-2.5 hover:bg-iso-elevated/50 flex flex-wrap items-center justify-between gap-2 text-xs"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-iso-ink">[{item.code}]</span>
+                    <span className="font-semibold text-iso-ink truncate">{item.name}</span>
+                  </div>
+                  <p className="text-[11px] text-iso-inkSecondary mt-0.5">{item.description}</p>
+                  <div className="font-mono text-[10px] text-iso-inkSecondary mt-0.5">
+                    ID : {item.id}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 font-sans shrink-0">
+                  {alreadyInstalled ? (
+                    <button
+                      type="button"
+                      onClick={() => actions.openExtensionPopup(item.id)}
+                      className="px-2.5 py-1 border border-iso-lineStrong bg-iso-elevated text-iso-signal font-semibold"
+                    >
+                      Ouvrir Popup
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={state.extensionInstalling}
+                      onClick={() => actions.installExtensionFromCws(item.id)}
+                      className="px-2.5 py-1 border border-iso-lineStrong bg-iso-elevated text-iso-ink font-semibold hover:border-iso-accent"
+                    >
+                      + Installer
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Installed Extensions List */}
+      <section className="border border-iso-line bg-iso-panel">
+        <div className="px-3 py-2 bg-iso-bg border-b border-iso-line font-mono text-[11px] text-iso-inkSecondary flex items-center justify-between">
+          <span>EXTENSIONS INSTALLÉES ({state.extensions.length})</span>
+          <span>POPUP &amp; GESTION</span>
+        </div>
+        {state.extensions.length === 0 ? (
+          <div className="p-4 text-xs text-iso-inkSecondary text-center">
+            Aucune extension installée pour le moment. Cliquez sur « + Installer » en face de Bitwarden
+            ci-dessus ou ouvrez le Chrome Web Store.
+          </div>
+        ) : (
+          <div className="divide-y divide-iso-line">
+            {state.extensions.map((ext) => (
+              <div
+                key={ext.id}
+                className="p-2.5 hover:bg-iso-elevated/50 flex flex-wrap items-center justify-between gap-2 text-xs"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-iso-signal inline-block shrink-0" />
+                    <span className="font-mono font-bold text-iso-ink">[{ext.code}]</span>
+                    <span className="font-semibold text-iso-ink truncate">{ext.name}</span>
+                    <span className="font-mono text-[11px] text-iso-inkSecondary">v{ext.version}</span>
+                  </div>
+                  <div className="text-[11px] text-iso-inkSecondary truncate mt-0.5">
+                    {ext.description}
+                  </div>
+                  <div className="font-mono text-[10px] text-iso-inkSecondary truncate mt-0.5">
+                    ID Runtime : {ext.runtimeId}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 font-sans shrink-0">
+                  {ext.popupPath && (
+                    <button
+                      type="button"
+                      onClick={() => actions.openExtensionPopup(ext.id)}
+                      className="px-2 py-1 border border-iso-lineStrong bg-iso-elevated text-iso-ink font-semibold hover:border-iso-accent"
+                    >
+                      Ouvrir Popup
+                    </button>
+                  )}
+                  {ext.optionsPath && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        actions.createTab(
+                          `chrome-extension://${ext.runtimeId}/${ext.optionsPath}`,
+                          state.activeWorkspaceId,
+                          false
+                        )
+                      }
+                      className="px-2 py-1 border border-iso-line bg-iso-bg text-iso-ink hover:border-iso-accent"
+                    >
+                      Options
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => actions.removeExtension(ext.id)}
+                    className="px-2 py-1 border border-iso-line bg-iso-bg text-iso-danger hover:border-iso-danger"
+                    title="Désinstaller cette extension"
+                  >
+                    Désinstaller
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 };

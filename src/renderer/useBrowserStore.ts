@@ -59,6 +59,10 @@ declare global {
       saveUserScript: (recipe: Partial<UserScriptRecipe>) => Promise<BrowserStateSnapshot>;
       deleteUserScript: (scriptId: string) => Promise<BrowserStateSnapshot>;
       rotateBridgeToken: () => Promise<BrowserStateSnapshot>;
+      installExtensionFromCws: (urlOrId: string) => Promise<BrowserStateSnapshot>;
+      installExtensionFromFolder: () => Promise<BrowserStateSnapshot>;
+      removeExtension: (extId: string) => Promise<BrowserStateSnapshot>;
+      openExtensionPopup: (extId: string) => Promise<BrowserStateSnapshot>;
     };
   }
 }
@@ -195,6 +199,9 @@ function buildInitialState(): BrowserStateSnapshot {
         },
       ],
     },
+    extensions: [],
+    extensionInstalling: false,
+    extensionStatusMessage: null,
   };
 }
 
@@ -209,6 +216,7 @@ function inferSecurityAndUrl(rawInput: string, apps: ConnectedApp[]): { url: str
     const titleMap: Record<string, string> = {
       'my://start': 'Planche de Pilotage ISO — MyBrowser',
       'my://apps': 'Favoris d’Applications & Ports Locaux',
+      'my://extensions': 'Extensions Chrome & Paquets CRX',
       'my://agent': 'Agent DOM, Diagnostic 3D & Pont 127.0.0.1',
       'my://privacy': 'Bouclier Réseau & Partitions Chromium',
       'my://3d-lab': 'Banc d’Essai WebGL2 / Shaders Temps Réel',
@@ -825,6 +833,68 @@ export function useBrowserStore() {
     }));
   }, []);
 
+  const installExtensionFromCws = useCallback(async (urlOrId: string) => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.installExtensionFromCws(urlOrId));
+      return;
+    }
+    const trimmed = urlOrId.trim();
+    const idMatch = trimmed.match(/([a-p]{32})/i);
+    const cwsId = idMatch ? idMatch[1].toLowerCase() : 'nngceckbapebfimnlniiiahkandclblb';
+    const isBitwarden = cwsId === 'nngceckbapebfimnlniiiahkandclblb' || /bitwarden/i.test(trimmed);
+    setState((prev) => {
+      const extItem = {
+        id: cwsId,
+        cwsId,
+        runtimeId: cwsId,
+        code: isBitwarden ? 'BIT' : 'EXT',
+        name: isBitwarden ? 'Gestionnaire de mots de passe Bitwarden' : `Extension (${cwsId.slice(0, 6)})`,
+        version: '2025.2.0',
+        description: 'Extension Chrome installée depuis le Chrome Web Store (.crx)',
+        popupPath: 'popup/index.html',
+        optionsPath: null,
+        installPath: `userData/extensions/${cwsId}`,
+        enabled: true,
+        installedAt: new Date().toLocaleTimeString(),
+      };
+      const exists = prev.extensions.some((e) => e.id === cwsId);
+      return {
+        ...prev,
+        extensions: exists
+          ? prev.extensions.map((e) => (e.id === cwsId ? extItem : e))
+          : [...prev.extensions, extItem],
+        extensionInstalling: false,
+        extensionStatusMessage: `Extension « ${extItem.name} » installée et prête.`,
+      };
+    });
+  }, []);
+
+  const installExtensionFromFolder = useCallback(async () => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.installExtensionFromFolder());
+      return;
+    }
+  }, []);
+
+  const removeExtension = useCallback(async (extId: string) => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.removeExtension(extId));
+      return;
+    }
+    setState((prev) => ({
+      ...prev,
+      extensions: prev.extensions.filter((e) => e.id !== extId),
+      extensionStatusMessage: 'Extension désinstallée.',
+    }));
+  }, []);
+
+  const openExtensionPopup = useCallback(async (extId: string) => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.openExtensionPopup(extId));
+      return;
+    }
+  }, []);
+
   const updateViewportBounds = useCallback((bounds: ViewportBoundsPayload) => {
     if (window.myBrowser) {
       window.myBrowser.updateViewportBounds(bounds);
@@ -861,6 +931,10 @@ export function useBrowserStore() {
       saveUserScript,
       deleteUserScript,
       rotateBridgeToken,
+      installExtensionFromCws,
+      installExtensionFromFolder,
+      removeExtension,
+      openExtensionPopup,
       updateViewportBounds,
     },
   };

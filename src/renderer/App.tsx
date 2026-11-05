@@ -23,6 +23,7 @@ import {
   X,
   BookmarkPlus,
   Server,
+  Puzzle,
 } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -212,6 +213,10 @@ export const App: React.FC = () => {
 
   const showRightSidebar = state.rightSidebarPanel !== 'none' && !isMobileViewport;
   const isPrimaryFocused = !state.splitMode || state.focusedPane === 'primary';
+  const isCwsDetailUrl =
+    /chromewebstore\.google\.com\/detail\/|chrome\.google\.com\/webstore\/detail\//i.test(
+      focusedTab?.url || ''
+    );
 
   return (
     <div className="h-screen w-screen flex flex-col bg-iso-bg text-iso-ink select-none overflow-hidden">
@@ -297,6 +302,20 @@ export const App: React.FC = () => {
             placeholder="URL, 127.0.0.1:port ou my://start, my://apps..."
             className="min-w-0 flex-1 h-full px-2 bg-transparent text-xs font-mono text-iso-ink focus:outline-none"
           />
+          {isCwsDetailUrl && (
+            <button
+              type="button"
+              onClick={() => actions.installExtensionFromCws(focusedTab.url)}
+              disabled={state.extensionInstalling}
+              className="h-full px-2.5 border-l border-iso-line bg-iso-accent text-[#0d1014] hover:bg-iso-accentHover inline-flex items-center gap-1 font-sans font-bold text-xs shrink-0"
+              title="Télécharger et installer directement cette extension Chrome (.crx) dans MyBrowser"
+            >
+              <Puzzle className="w-3.5 h-3.5" />
+              <span>
+                {state.extensionInstalling ? 'Installation CRX…' : '+ Installer l’extension'}
+              </span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => handleOpenAddAppDrawer()}
@@ -308,8 +327,36 @@ export const App: React.FC = () => {
           </button>
         </form>
 
-        {/* Right Controls: Split-View A|B, Tabular Shield Telemetry, Local Bridge & Right Panel */}
+        {/* Right Controls: Installed Extensions, Split-View A|B, Shield, Bridge & Right Panel */}
         <div className="flex items-center gap-1 shrink-0 text-[11px]">
+          {/* Installed Chrome Extension Action Badges (e.g. Bitwarden Popup) */}
+          {state.extensions.map((ext) => (
+            <button
+              key={ext.id}
+              type="button"
+              onClick={() => actions.openExtensionPopup(ext.id)}
+              className="h-7 px-2 border border-iso-lineStrong bg-iso-elevated text-iso-ink hover:border-iso-accent inline-flex items-center gap-1 font-mono font-bold"
+              title={`Ouvrir l’extension ${ext.name} (v${ext.version})`}
+            >
+              <span className="w-1.5 h-1.5 bg-iso-signal inline-block" />
+              <span>{ext.code}</span>
+            </button>
+          ))}
+
+          <button
+            type="button"
+            onClick={() => actions.navigate('my://extensions', focusedTab?.id)}
+            className={`h-7 px-2 border inline-flex items-center gap-1.5 font-mono tabular-nums ${
+              focusedTab?.url === 'my://extensions'
+                ? 'bg-iso-elevated text-iso-ink border-iso-accent font-semibold'
+                : 'bg-iso-bg text-iso-inkSecondary border-iso-line hover:text-iso-ink'
+            }`}
+            title="Gérer et installer des extensions Chrome (.crx / Chrome Web Store)"
+          >
+            <Puzzle className="w-3.5 h-3.5 text-iso-ink" />
+            <span className="hidden sm:inline">EXT:{state.extensions.length}</span>
+          </button>
+
           <button
             type="button"
             onClick={() => actions.toggleSplitMode()}
