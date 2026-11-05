@@ -27,16 +27,17 @@ export function extractCwsExtensionId(input: string): string | null {
   return null;
 }
 
+const CWS_COMPAT_CHROME_VERSION = '136.0.0.0';
+
 function downloadBufferWithRedirects(url: string, maxRedirects = 6): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const request = (currentUrl: string, redirectsLeft: number) => {
-      const chromeVer = process.versions.chrome || '130.0.6723.116';
       https
         .get(
           currentUrl,
           {
             headers: {
-              'User-Agent': `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${chromeVer} Safari/537.36`,
+              'User-Agent': `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${CWS_COMPAT_CHROME_VERSION} Safari/537.36`,
               Accept: '*/*',
             },
           },
@@ -172,6 +173,17 @@ function readExtensionManifest(extDir: string): ParsedManifestInfo {
   }
 
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+
+  // Remove minimum_chrome_version if present so Electron's internal Chromium version check does not block recent extensions (e.g. Bitwarden 2026+)
+  if (manifest.minimum_chrome_version) {
+    delete manifest.minimum_chrome_version;
+    try {
+      fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');
+    } catch {
+      // Ignore if read-only
+    }
+  }
+
   const defaultLocale = manifest.default_locale;
 
   const rawName = resolveLocalizedString(manifest.name, extDir, defaultLocale) || 'Extension Chrome';
@@ -326,9 +338,8 @@ export class ExtensionManager {
     this.onStateChanged();
 
     try {
-      const chromeVer = process.versions.chrome || '130.0.6723.116';
       const crxUrl = `https://clients2.google.com/service/update2/crx?response=redirect&prodversion=${encodeURIComponent(
-        chromeVer
+        CWS_COMPAT_CHROME_VERSION
       )}&acceptformat=crx2,crx3&x=id%3D${encodeURIComponent(cwsId)}%26installsource%3Dondemand%26uc`;
 
       const crxBuffer = await downloadBufferWithRedirects(crxUrl);

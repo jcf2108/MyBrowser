@@ -37,9 +37,9 @@ app.commandLine.appendSwitch('ignore-gpu-blocklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
 app.commandLine.appendSwitch('enable-zero-copy');
 
-// Present a clean standard Chrome User-Agent so Chrome Web Store and web apps do not block Electron
-const CHROME_VERSION = process.versions.chrome || '130.0.6723.116';
-const CLEAN_CHROME_UA = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${CHROME_VERSION} Safari/537.36`;
+// Present a clean Chrome 136 User-Agent so Chrome Web Store and web apps never reject extensions with minimum_chrome_version >= 134
+const CLEAN_CHROME_UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
 app.userAgentFallback = CLEAN_CHROME_UA;
 
 class MyBrowserKernel {
@@ -254,18 +254,19 @@ class MyBrowserKernel {
 
     view.webContents
       .executeJavaScript(`(() => {
-        if (window.__mybrowser_cws_hooked__) return;
-        window.__mybrowser_cws_hooked__ = true;
-
         const enhanceCwsPage = () => {
-          // 1. Hide "Switch to Chrome" / "Passez à Chrome" banner if displayed
+          if (!document.body) return;
+
+          // 1. Hide "Passez à Chrome" or "Élément actuellement indisponible" banners
           document.querySelectorAll('div, section, aside').forEach((el) => {
             const txt = (el.textContent || '').trim();
             if (
-              (txt.includes('Passez à Chrome pour installer') ||
-                txt.includes('Switch to Chrome to install')) &&
-              el.clientHeight > 20 &&
-              el.clientHeight < 140
+              (txt.includes('Passez à Chrome') ||
+                txt.includes('Switch to Chrome') ||
+                txt.includes('Élément actuellement indisponible') ||
+                txt.includes('This item is not available')) &&
+              el.clientHeight > 18 &&
+              el.clientHeight < 130
             ) {
               el.style.display = 'none';
             }
@@ -275,19 +276,26 @@ class MyBrowserKernel {
           document.querySelectorAll('button').forEach((btn) => {
             const label = (btn.textContent || '').trim();
             if (
-              /Ajouter à Google Chrome|Add to Chrome|Installer|Ajouter à Chrome/i.test(label)
+              /Ajouter à Google Chrome|Add to Chrome|Installer dans MyBrowser|Ajouter à Chrome/i.test(
+                label
+              )
             ) {
               btn.removeAttribute('disabled');
               btn.removeAttribute('aria-disabled');
+              btn.disabled = false;
               btn.style.pointerEvents = 'auto';
               btn.style.cursor = 'pointer';
               btn.style.opacity = '1';
               btn.style.backgroundColor = '#ff5a26';
               btn.style.color = '#0d1014';
               btn.style.fontWeight = '700';
+              if (btn.parentElement) {
+                btn.parentElement.style.pointerEvents = 'auto';
+                btn.parentElement.style.cursor = 'pointer';
+              }
               if (!btn.dataset.mybrowserHooked) {
                 btn.dataset.mybrowserHooked = '1';
-                btn.textContent = 'Installer dans MyBrowser';
+                btn.textContent = '+ Installer dans MyBrowser';
                 btn.addEventListener(
                   'click',
                   (e) => {
@@ -302,7 +310,7 @@ class MyBrowserKernel {
             }
           });
 
-          // 3. Inject a floating ISO action pill on any /detail/ extension page
+          // 3. Inject a floating ISO action button on any /detail/ extension page
           const isDetailPage = /\\/detail\\//i.test(location.pathname);
           let floatingBtn = document.getElementById('__mybrowser_cws_install_pill__');
           if (isDetailPage) {
@@ -313,20 +321,22 @@ class MyBrowserKernel {
               floatingBtn.textContent = '+ INSTALLER DANS MYBROWSER (.CRX)';
               Object.assign(floatingBtn.style, {
                 position: 'fixed',
-                bottom: '20px',
-                right: '20px',
+                bottom: '22px',
+                right: '22px',
                 zIndex: '2147483647',
                 backgroundColor: '#ff5a26',
                 color: '#0d1014',
-                border: '1px solid #0d1014',
-                padding: '10px 16px',
+                border: '2px solid #0d1014',
+                padding: '11px 18px',
                 fontFamily: 'monospace',
-                fontSize: '12px',
+                fontSize: '13px',
                 fontWeight: '700',
                 cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.45)',
+                boxShadow: '0 6px 20px rgba(0,0,0,0.55)',
               });
-              floatingBtn.addEventListener('click', () => {
+              floatingBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 floatingBtn.textContent = 'TÉLÉCHARGEMENT CRX EN COURS...';
                 console.log('__MYBROWSER_INSTALL_EXT__:' + location.href);
               });
@@ -338,8 +348,13 @@ class MyBrowserKernel {
         };
 
         enhanceCwsPage();
-        const obs = new MutationObserver(() => enhanceCwsPage());
-        obs.observe(document.documentElement, { childList: true, subtree: true });
+
+        if (!window.__mybrowser_cws_observer_active__) {
+          window.__mybrowser_cws_observer_active__ = true;
+          const obs = new MutationObserver(() => enhanceCwsPage());
+          obs.observe(document.documentElement, { childList: true, subtree: true });
+          setInterval(enhanceCwsPage, 800);
+        }
       })()`)
       .catch(() => {});
   }
@@ -368,10 +383,16 @@ class MyBrowserKernel {
 
     view.webContents.on('did-stop-loading', () => {
       tab.isLoading = false;
+      const currentMainUrl = view.webContents.getURL();
+      if (currentMainUrl && !currentMainUrl.startsWith('my://')) {
+        const resolved = this.resolveUrlAndSecurity(currentMainUrl);
+        tab.url = resolved.url;
+        tab.securityState = resolved.securityState;
+      }
       tab.canGoBack = view.webContents.navigationHistory.canGoBack();
       tab.canGoForward = view.webContents.navigationHistory.canGoForward();
       tab.title = view.webContents.getTitle() || tab.url;
-      this.injectChromeWebStoreEnhancer(view, view.webContents.getURL());
+      this.injectChromeWebStoreEnhancer(view, currentMainUrl);
       this.broadcastState();
     });
 
@@ -390,7 +411,8 @@ class MyBrowserKernel {
       this.broadcastState();
     });
 
-    view.webContents.on('did-navigate-in-page', (_e, url) => {
+    view.webContents.on('did-navigate-in-page', (_e, url, isMainFrame) => {
+      if (!isMainFrame) return;
       const resolved = this.resolveUrlAndSecurity(url);
       tab.url = resolved.url;
       tab.securityState = resolved.securityState;

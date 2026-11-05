@@ -1,6 +1,6 @@
 {
   "name": "mybrowser",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "PolyForm-Noncommercial-1.0.0",
   "description": "Navigateur web Chromium personnalisable (Electron WebContentsView) avec onglets verticaux, Split-View, dock d'applications externes à port configurable, bloqueur réseau et agent local.",
   "main": "dist-electron/main/index.js",

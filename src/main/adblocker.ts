@@ -128,13 +128,19 @@ export class NetworkShieldEngine {
     });
 
     ses.webRequest.onBeforeSendHeaders((details, callback) => {
+      const requestHeaders = { ...details.requestHeaders };
+      requestHeaders['User-Agent'] =
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
+      requestHeaders['sec-ch-ua'] =
+        '"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"';
+      requestHeaders['sec-ch-ua-mobile'] = '?0';
+      requestHeaders['sec-ch-ua-platform'] = '"Windows"';
+
       if (this.state.enabled && this.state.strictPrivacyHeaders) {
-        const requestHeaders = { ...details.requestHeaders };
         requestHeaders['DNT'] = '1';
         requestHeaders['Sec-GPC'] = '1';
-        return callback({ requestHeaders });
       }
-      return callback({ requestHeaders: details.requestHeaders });
+      return callback({ requestHeaders });
     });
   }
 }
