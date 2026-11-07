@@ -36,6 +36,7 @@ function downloadBufferWithRedirects(url: string, maxRedirects = 6): Promise<Buf
         .get(
           currentUrl,
           {
+            family: 4,
             headers: {
               'User-Agent': `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${CWS_COMPAT_CHROME_VERSION} Safari/537.36`,
               Accept: '*/*',

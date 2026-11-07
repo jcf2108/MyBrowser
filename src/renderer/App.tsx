@@ -853,17 +853,27 @@ export const App: React.FC = () => {
                       ? actions.applyUpdate()
                       : actions.checkForUpdates()
                   }
-                  className="hover:text-iso-ink text-left truncate"
+                  className={`px-1.5 py-0.5 border text-left truncate ${
+                    state.updater.status === 'available' || state.updater.status === 'downloaded'
+                      ? 'bg-iso-accent text-[#0d1014] border-iso-accent font-bold'
+                      : state.updater.status === 'checking' || state.updater.status === 'downloading'
+                      ? 'bg-iso-elevated text-iso-ink border-iso-accent font-semibold'
+                      : 'bg-iso-panel text-iso-ink border-iso-line hover:border-iso-accent'
+                  }`}
                   title={
                     state.updater.message ||
-                    'Cliquer pour vérifier les mises à jour sur GitHub Releases'
+                    'Cliquer pour vérifier et installer les mises à jour depuis GitHub Releases'
                   }
                 >
                   v{state.updater.currentVersion} ·{' '}
                   {state.updater.status === 'checking'
                     ? 'VÉRIF…'
+                    : state.updater.status === 'downloading'
+                    ? `TÉLÉCH. ${state.updater.progressPercent}%`
                     : state.updater.status === 'available' || state.updater.status === 'downloaded'
-                    ? `MAJ v${state.updater.latestVersion}`
+                    ? `INSTALLER v${state.updater.latestVersion}`
+                    : state.updater.status === 'up-to-date'
+                    ? 'À JOUR ✓'
                     : 'MAJ AUTO'}
                 </button>
                 <span className="text-iso-signal">127.0.0.1:{state.bridge.port}</span>

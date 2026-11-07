@@ -32,10 +32,12 @@ function isRemoteVersionNewer(remoteVer: string, currentVer: string): boolean {
 
 function fetchJsonFromUrl(url: string): Promise<Record<string, unknown>> {
   return new Promise((resolve, reject) => {
-    https
+    const req = https
       .get(
         url,
         {
+          family: 4,
+          timeout: 8000,
           headers: {
             'User-Agent': `MyBrowser-Updater/${app.getVersion()}`,
             Accept: 'application/vnd.github+json',
@@ -66,6 +68,10 @@ function fetchJsonFromUrl(url: string): Promise<Record<string, unknown>> {
         }
       )
       .on('error', reject);
+
+    req.on('timeout', () => {
+      req.destroy(new Error('Délai dépassé'));
+    });
   });
 }
 
@@ -80,6 +86,7 @@ function downloadFileWithProgress(
       .get(
         url,
         {
+          family: 4,
           headers: {
             'User-Agent': `MyBrowser-Updater/${app.getVersion()}`,
             Accept: '*/*',
@@ -145,7 +152,7 @@ export class UpdateManager {
   constructor(onStateChanged: () => void) {
     this.onStateChanged = onStateChanged;
     this.state = {
-      currentVersion: app.getVersion() || '0.1.4',
+      currentVersion: app.getVersion() || '0.1.5',
       latestVersion: null,
       status: 'idle',
       progressPercent: 0,
@@ -163,21 +170,21 @@ export class UpdateManager {
 
   private setupElectronAutoUpdater(): void {
     try {
-      autoUpdater.autoDownload = true;
+      // Do not auto-download via NsisUpdater on unsigned builds to avoid Authenticode signature lockups;
+      // direct GitHub Release asset download handles both NSIS Setup.exe and Portable .exe reliably.
+      autoUpdater.autoDownload = false;
       autoUpdater.autoInstallOnAppQuit = true;
 
       autoUpdater.on('update-available', (info) => {
         const ver = String(info.version || '').replace(/^v/i, '');
-        this.state.latestVersion = ver;
-        this.state.status = 'downloading';
-        this.state.message = `Téléchargement automatique de la mise à jour v${ver}…`;
-        this.onStateChanged();
-      });
-
-      autoUpdater.on('download-progress', (prog) => {
-        this.state.status = 'downloading';
-        this.state.progressPercent = Math.round(prog.percent || 0);
-        this.onStateChanged();
+        if (ver && isRemoteVersionNewer(ver, this.state.currentVersion)) {
+          this.state.latestVersion = ver;
+          if (this.state.status !== 'downloading' && this.state.status !== 'downloaded') {
+            this.state.status = 'available';
+            this.state.message = `Nouvelle version v${ver} disponible — cliquez pour installer.`;
+            this.onStateChanged();
+          }
+        }
       });
 
       autoUpdater.on('update-downloaded', (info) => {
@@ -191,7 +198,14 @@ export class UpdateManager {
       });
 
       autoUpdater.on('error', () => {
-        // Fallback silently to GitHub Releases direct API if electron-updater encounters a signature/portable limitation
+        if (this.state.status === 'downloading') {
+          this.state.status =
+            this.state.latestVersion &&
+            isRemoteVersionNewer(this.state.latestVersion, this.state.currentVersion)
+              ? 'available'
+              : 'idle';
+          this.onStateChanged();
+        }
       });
     } catch {
       // Ignore in dev mode
@@ -203,22 +217,18 @@ export class UpdateManager {
       return this.getState();
     }
 
+    // If user clicked the button while an update was already detected as available, install it immediately
+    if (manual && (this.state.status === 'available' || this.state.status === 'downloaded')) {
+      return this.applyOrDownloadUpdate();
+    }
+
     if (manual) {
       this.state.status = 'checking';
       this.state.message = 'Vérification des mises à jour sur GitHub Releases…';
       this.onStateChanged();
     }
 
-    // 1. Trigger native electron-updater when packaged (NSIS installation)
-    if (app.isPackaged && !process.env.PORTABLE_EXECUTABLE_FILE) {
-      try {
-        autoUpdater.checkForUpdates().catch(() => {});
-      } catch {
-        // Fallback below
-      }
-    }
-
-    // 2. Always query GitHub Releases API so both NSIS and Portable builds detect new versions
+    // Query GitHub Releases API directly (works on both NSIS Setup and Portable builds without signature errors)
     try {
       const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`;
       const release = await fetchJsonFromUrl(apiUrl);
@@ -232,7 +242,7 @@ export class UpdateManager {
         ? (release.assets as Array<Record<string, unknown>>)
         : [];
 
-      // Prefer Setup.exe for full installation, or any .exe asset
+      // Prefer Setup.exe for full installation, or Portable .exe when running portable
       const isPortableRuntime = Boolean(process.env.PORTABLE_EXECUTABLE_FILE);
       const preferredAsset =
         assets.find((a) => {
@@ -249,25 +259,24 @@ export class UpdateManager {
       this.state.releaseUrl = htmlUrl;
       this.state.downloadUrl = assetDownloadUrl;
 
-      const currentStatus = this.getState().status;
       if (cleanVersion && isRemoteVersionNewer(cleanVersion, this.state.currentVersion)) {
         this.state.latestVersion = cleanVersion;
-        if (currentStatus !== 'downloading' && currentStatus !== 'downloaded') {
-          this.state.status = 'available';
-          this.state.message = `Nouvelle version v${cleanVersion} disponible sur GitHub.`;
+        this.state.status = 'available';
+        this.state.message = `Nouvelle version v${cleanVersion} disponible sur GitHub.`;
+        this.onStateChanged();
+
+        // When the user explicitly clicked the update button and a new version is found, start downloading right away
+        if (manual) {
+          return await this.applyOrDownloadUpdate();
         }
       } else {
         this.state.latestVersion = cleanVersion || this.state.currentVersion;
-        if (currentStatus !== 'downloading' && currentStatus !== 'downloaded') {
-          this.state.status = 'up-to-date';
-          this.state.message = `MyBrowser v${this.state.currentVersion} est à jour.`;
-        }
+        this.state.status = 'up-to-date';
+        this.state.message = `MyBrowser v${this.state.currentVersion} est à jour.`;
       }
     } catch {
-      if (manual && this.state.status === 'checking') {
-        this.state.status = 'up-to-date';
-        this.state.message = `Version active : v${this.state.currentVersion}`;
-      }
+      this.state.status = 'up-to-date';
+      this.state.message = `Version active : v${this.state.currentVersion}`;
     }
 
     this.onStateChanged();
@@ -288,6 +297,11 @@ export class UpdateManager {
       await shell.openPath(this.downloadedInstallerPath);
       setTimeout(() => app.quit(), 1200);
       return this.getState();
+    }
+
+    // Ensure we have downloadUrl if not yet populated
+    if (!this.state.downloadUrl) {
+      await this.checkForUpdates(false);
     }
 
     // Case 3: Download the .exe asset directly from GitHub Release and launch it
@@ -314,6 +328,8 @@ export class UpdateManager {
         setTimeout(() => app.quit(), 1500);
         return this.getState();
       } catch {
+        this.state.status = 'available';
+        this.onStateChanged();
         // Fallback: open GitHub Release page in external browser
         if (this.state.releaseUrl) {
           shell.openExternal(this.state.releaseUrl);
