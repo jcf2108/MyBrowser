@@ -1,274 +1,305 @@
-import { ipcRenderer, webFrame } from 'electron';
+import { contextBridge, ipcRenderer, webFrame } from 'electron';
 
 const FIREFOX_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0';
-const CWS_CHROME_136_UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
-
-// 1. On Google Sign-In (accounts.google.com), mask embedded Chromium indicators in Main World
-// so Google OAuth / Gmail login does not reject the browser with "This browser or app may not be secure"
-if (
-  typeof window !== 'undefined' &&
-  /(^|\.)accounts\.google\.com$/i.test(window.location.hostname)
-) {
-  try {
-    webFrame.executeJavaScript(`(() => {
-      try {
-        Object.defineProperty(navigator, 'userAgent', {
-          get: () => '${FIREFOX_UA}',
-          configurable: true
-        });
-        Object.defineProperty(navigator, 'appVersion', {
-          get: () => '5.0 (Windows)',
-          configurable: true
-        });
-        Object.defineProperty(navigator, 'vendor', {
-          get: () => '',
-          configurable: true
-        });
-        Object.defineProperty(navigator, 'userAgentData', {
-          get: () => undefined,
-          configurable: true
-        });
-        Object.defineProperty(navigator, 'webdriver', {
-          get: () => false,
-          configurable: true
-        });
-        try {
-          delete window.chrome;
-        } catch {}
-      } catch {}
-    })()`);
-  } catch {
-    // Ignore if main frame not ready
-  }
-}
-
-// 1b. On Chrome Web Store, expose Chrome 136 User-Agent in Main World without calling
-// webContents.setUserAgent mid-redirect (which would abort CWS redirects with ERR_ABORTED)
-if (
-  typeof window !== 'undefined' &&
-  /^(chromewebstore\.google\.com|chrome\.google\.com)$/i.test(window.location.hostname)
-) {
-  try {
-    webFrame.executeJavaScript(`(() => {
-      try {
-        Object.defineProperty(navigator, 'userAgent', {
-          get: () => '${CWS_CHROME_136_UA}',
-          configurable: true
-        });
-        Object.defineProperty(navigator, 'webdriver', {
-          get: () => false,
-          configurable: true
-        });
-      } catch {}
-    })()`);
-  } catch {
-    // Ignore if frame not ready
-  }
-}
-
-// 2. On Chrome Web Store (chromewebstore.google.com), unlock the disabled "Ajouter à Google Chrome"
-// button and wire it directly to MyBrowser's native .CRX installer via ipcRenderer
-function setupChromeWebStoreEnhancer(): void {
-  const host = window.location.hostname.toLowerCase();
-  if (host !== 'chromewebstore.google.com' && host !== 'chrome.google.com') {
-    return;
-  }
-
-  let isInstallingNow = false;
-
-  const triggerInstall = (btnEl?: HTMLElement | null) => {
-    if (isInstallingNow) return;
-    isInstallingNow = true;
-    const currentUrl = window.location.href;
-
-    if (btnEl) {
-      btnEl.textContent = 'Installation CRX en cours…';
-      btnEl.style.backgroundColor = '#2ea043';
-      btnEl.style.color = '#0d1014';
-    }
-    const pill = document.getElementById('__mybrowser_cws_install_pill__');
-    if (pill) {
-      pill.textContent = 'TÉLÉCHARGEMENT & ACTIVATION CRX EN COURS…';
-      pill.style.backgroundColor = '#2ea043';
-    }
-
-    ipcRenderer
-      .invoke('browser:install-extension-cws', currentUrl)
-      .then(() => {
-        isInstallingNow = false;
-        if (btnEl) {
-          btnEl.textContent = '✓ Installée dans MyBrowser';
-        }
-        if (pill) {
-          pill.textContent = '✓ EXTENSION INSTALLÉE DANS MYBROWSER';
-        }
-      })
-      .catch(() => {
-        isInstallingNow = false;
-        if (btnEl) {
-          btnEl.textContent = '+ Installer dans MyBrowser';
-        }
-        if (pill) {
-          pill.textContent = '+ INSTALLER DANS MYBROWSER (.CRX)';
-        }
-      });
-  };
-
-  const enhancePage = () => {
-    if (!document.body) return;
-
-    // A. Hide "Passez à Chrome" / "Élément actuellement indisponible" warning leaf banners
-    document.querySelectorAll('div, section, aside').forEach((el) => {
-      const htmlEl = el as HTMLElement;
-      const txt = (htmlEl.textContent || '').trim();
-      if (
-        txt.length > 0 &&
-        txt.length < 220 &&
-        (txt.includes('Passez à Chrome') ||
-          txt.includes('Switch to Chrome') ||
-          txt.includes('Élément actuellement indisponible') ||
-          txt.includes('This item is not available')) &&
-        !htmlEl.querySelector('main, c-wiz, [role="main"]') &&
-        htmlEl.clientHeight > 16 &&
-        htmlEl.clientHeight < 140
-      ) {
-        htmlEl.style.display = 'none';
-      }
-    });
-
-    // B. Unlock and style the "Ajouter à Google Chrome" / "Add to Chrome" button
-    document.querySelectorAll('button, [role="button"]').forEach((node) => {
-      const btn = node as HTMLButtonElement;
-      const label = (btn.textContent || '').trim();
-      if (
-        /Ajouter à Google Chrome|Add to Chrome|Ajouter à Chrome|Installer dans MyBrowser/i.test(
-          label
-        )
-      ) {
-        btn.removeAttribute('disabled');
-        btn.removeAttribute('aria-disabled');
-        btn.disabled = false;
-        try {
-          Object.defineProperty(btn, 'disabled', {
-            get: () => false,
-            set: () => {},
-            configurable: true,
-          });
-        } catch {
-          // Ignore if already defined
-        }
-        btn.style.pointerEvents = 'auto';
-        btn.style.cursor = 'pointer';
-        btn.style.opacity = '1';
-        btn.style.backgroundColor = '#ff5a26';
-        btn.style.color = '#0d1014';
-        btn.style.fontWeight = '700';
-        btn.style.border = '1px solid #0d1014';
-
-        // Also ensure parent wrapper does not block pointer events on disabled buttons
-        let parent = btn.parentElement;
-        for (let i = 0; i < 3 && parent; i++) {
-          parent.style.pointerEvents = 'auto';
-          parent.style.cursor = 'pointer';
-          parent = parent.parentElement;
-        }
-
-        if (!btn.dataset.mybrowserHooked) {
-          btn.dataset.mybrowserHooked = '1';
-          if (!label.includes('MyBrowser')) {
-            btn.textContent = '+ Installer dans MyBrowser';
-          }
-          btn.addEventListener(
-            'click',
-            (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              triggerInstall(btn);
-            },
-            true
-          );
-        }
-      }
-    });
-
-    // C. Mount a persistent bottom-right action button on any /detail/ extension page
-    const isDetailPage = /\/detail\//i.test(window.location.pathname);
-    let floatingBtn = document.getElementById('__mybrowser_cws_install_pill__') as HTMLButtonElement | null;
-    if (isDetailPage) {
-      if (!floatingBtn) {
-        floatingBtn = document.createElement('button');
-        floatingBtn.id = '__mybrowser_cws_install_pill__';
-        floatingBtn.type = 'button';
-        floatingBtn.textContent = '+ INSTALLER DANS MYBROWSER (.CRX)';
-        Object.assign(floatingBtn.style, {
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          zIndex: '2147483647',
-          backgroundColor: '#ff5a26',
-          color: '#0d1014',
-          border: '2px solid #0d1014',
-          padding: '12px 18px',
-          fontFamily: 'monospace',
-          fontSize: '13px',
-          fontWeight: '700',
-          cursor: 'pointer',
-          boxShadow: '0 6px 20px rgba(0,0,0,0.55)',
-        });
-        floatingBtn.addEventListener(
-          'click',
-          (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            triggerInstall(floatingBtn);
-          },
-          true
-        );
-        document.body.appendChild(floatingBtn);
-      }
-    } else if (floatingBtn) {
-      floatingBtn.remove();
-    }
-  };
-
-  // Global capture-phase click listener in case CWS wraps the button in a span/div
-  window.addEventListener(
-    'click',
-    (e) => {
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-      const btn = target.closest('button, [role="button"]') as HTMLElement | null;
-      if (!btn) return;
-      const txt = (btn.textContent || '').trim();
-      if (
-        /Ajouter à Google Chrome|Add to Chrome|Ajouter à Chrome|Installer dans MyBrowser/i.test(txt)
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        triggerInstall(btn);
-      }
-    },
-    true
-  );
-
-  const startObservers = () => {
-    enhancePage();
-    if (document.documentElement) {
-      const obs = new MutationObserver(() => enhancePage());
-      obs.observe(document.documentElement, { childList: true, subtree: true });
-    }
-    setInterval(enhancePage, 700);
-  };
-
-  if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', startObservers, { once: true });
-  } else {
-    startObservers();
-  }
-}
+const CHROME_141_VERSION = '141.0.7390.55';
+const CHROME_141_UA = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${CHROME_141_VERSION} Safari/537.36`;
 
 if (typeof window !== 'undefined') {
-  setupChromeWebStoreEnhancer();
+  const host = window.location.hostname.toLowerCase();
+  const pathname = window.location.pathname;
+  const search = window.location.search;
+
+  const isInteractiveGoogleSignIn =
+    (host === 'accounts.google.com' || host.endsWith('.accounts.google.com')) &&
+    !/^\/(CheckCookie|SetSID|RotateCookiesPage|ListAccounts|PassiveLoginProber|gsi|o\/oauth2\/postmessageRelay)/i.test(
+      pathname
+    ) &&
+    !/[?&]passive=true\b/i.test(search);
+
+  // 1. Interactive Google Sign-In: present clean desktop Firefox identity so Google OAuth never blocks embedded Chromium
+  if (isInteractiveGoogleSignIn) {
+    try {
+      webFrame.executeJavaScript(`(() => {
+        try {
+          Object.defineProperty(navigator, 'userAgent', {
+            get: () => '${FIREFOX_UA}',
+            configurable: true
+          });
+          Object.defineProperty(navigator, 'appVersion', {
+            get: () => '5.0 (Windows)',
+            configurable: true
+          });
+          Object.defineProperty(navigator, 'vendor', {
+            get: () => '',
+            configurable: true
+          });
+          Object.defineProperty(navigator, 'userAgentData', {
+            get: () => undefined,
+            configurable: true
+          });
+          Object.defineProperty(navigator, 'webdriver', {
+            get: () => false,
+            configurable: true
+          });
+          try {
+            delete window.chrome;
+          } catch {}
+        } catch {}
+      })()`);
+    } catch {
+      // Ignore if frame not ready
+    }
+  } else {
+    // 2. All other pages (including www.google.com & Chrome Web Store): consistent Chrome 141 navigator identity
+    try {
+      webFrame.executeJavaScript(`(() => {
+        try {
+          Object.defineProperty(navigator, 'userAgent', {
+            get: () => '${CHROME_141_UA}',
+            configurable: true
+          });
+          Object.defineProperty(navigator, 'webdriver', {
+            get: () => false,
+            configurable: true
+          });
+          const uaData = {
+            brands: [
+              { brand: 'Google Chrome', version: '141' },
+              { brand: 'Not?A_Brand', version: '8' },
+              { brand: 'Chromium', version: '141' }
+            ],
+            mobile: false,
+            platform: 'Windows',
+            getHighEntropyValues: async () => ({
+              architecture: 'x86',
+              bitness: '64',
+              brands: [
+                { brand: 'Google Chrome', version: '141' },
+                { brand: 'Not?A_Brand', version: '8' },
+                { brand: 'Chromium', version: '141' }
+              ],
+              fullVersionList: [
+                { brand: 'Google Chrome', version: '${CHROME_141_VERSION}' },
+                { brand: 'Not?A_Brand', version: '8.0.0.0' },
+                { brand: 'Chromium', version: '${CHROME_141_VERSION}' }
+              ],
+              mobile: false,
+              model: '',
+              platform: 'Windows',
+              platformVersion: '15.0.0',
+              uaFullVersion: '${CHROME_141_VERSION}'
+            }),
+            toJSON() {
+              return { brands: this.brands, mobile: this.mobile, platform: this.platform };
+            }
+          };
+          Object.defineProperty(navigator, 'userAgentData', {
+            get: () => uaData,
+            configurable: true
+          });
+        } catch {}
+      })()`);
+    } catch {
+      // Ignore if frame not ready
+    }
+  }
+
+  // 3. Native Chrome Web Store API (window.chrome.webstorePrivate & window.chrome.management)
+  // Enables Google's official "Ajouter à Google Chrome" & "Supprimer de Chrome" buttons natively without any parallel UI
+  if (host === 'chromewebstore.google.com' || host === 'chrome.google.com') {
+    try {
+      contextBridge.exposeInMainWorld('__mybrowserCwsNative', {
+        getInstalled: () => ipcRenderer.invoke('browser:cws-get-installed'),
+        beginInstall: (details: Record<string, unknown>) =>
+          ipcRenderer.invoke('browser:cws-begin-install', details),
+        uninstall: (id: string, showConfirmDialog: boolean) =>
+          ipcRenderer.invoke('browser:cws-uninstall', { id, showConfirmDialog }),
+      });
+
+      webFrame.executeJavaScript(`(() => {
+        const bridge = window.__mybrowserCwsNative;
+        if (!bridge) return;
+
+        const makeEvent = () => {
+          const listeners = [];
+          return {
+            addListener(fn) {
+              if (typeof fn === 'function' && !listeners.includes(fn)) listeners.push(fn);
+            },
+            removeListener(fn) {
+              const idx = listeners.indexOf(fn);
+              if (idx >= 0) listeners.splice(idx, 1);
+            },
+            hasListener(fn) {
+              return listeners.includes(fn);
+            },
+            hasListeners() {
+              return listeners.length > 0;
+            },
+            _emit(...args) {
+              for (const fn of [...listeners]) {
+                try { fn(...args); } catch {}
+              }
+            }
+          };
+        };
+
+        const onInstalledEvent = makeEvent();
+        const onUninstalledEvent = makeEvent();
+
+        if (!window.chrome) window.chrome = {};
+        if (!window.chrome.runtime) window.chrome.runtime = {};
+
+        const managementApi = {
+          getAll(cb) {
+            bridge
+              .getInstalled()
+              .then((list) => {
+                if (typeof cb === 'function') cb(Array.isArray(list) ? list : []);
+              })
+              .catch(() => {
+                if (typeof cb === 'function') cb([]);
+              });
+          },
+          getPermissionWarningsByManifest(_manifestStr, cb) {
+            if (typeof cb === 'function') setTimeout(() => cb([]), 0);
+          },
+          setEnabled(_id, _enabled, cb) {
+            if (typeof cb === 'function') setTimeout(() => cb(), 0);
+          },
+          uninstall(id, options, cb) {
+            const callback = typeof options === 'function' ? options : cb;
+            const showConfirm =
+              typeof options === 'object' && options !== null
+                ? Boolean(options.showConfirmDialog)
+                : false;
+            bridge
+              .uninstall(id, showConfirm)
+              .then((res) => {
+                if (res && res.cancelled) {
+                  window.chrome.runtime.lastError = { message: 'User cancelled uninstall' };
+                  if (typeof callback === 'function') callback();
+                  delete window.chrome.runtime.lastError;
+                  return;
+                }
+                delete window.chrome.runtime.lastError;
+                onUninstalledEvent._emit(id);
+                if (typeof callback === 'function') callback();
+              })
+              .catch((err) => {
+                window.chrome.runtime.lastError = { message: String(err || 'Uninstall failed') };
+                if (typeof callback === 'function') callback();
+                delete window.chrome.runtime.lastError;
+              });
+          },
+          onInstalled: onInstalledEvent,
+          onUninstalled: onUninstalledEvent,
+          onEnabled: makeEvent(),
+          onDisabled: makeEvent()
+        };
+
+        Object.defineProperty(window.chrome, 'management', {
+          configurable: true,
+          get: () => managementApi,
+          set: () => {}
+        });
+
+        let pendingInstallPromise = null;
+
+        const webstorePrivateApi = {
+          beginInstallWithManifest3(details, cb) {
+            pendingInstallPromise = bridge.beginInstall(details || {});
+            pendingInstallPromise
+              .then((result) => {
+                if (result && result.ok) {
+                  delete window.chrome.runtime.lastError;
+                  if (typeof cb === 'function') cb('');
+                } else {
+                  const code = (result && result.code) || 'user_cancelled';
+                  if (code !== 'user_cancelled') {
+                    window.chrome.runtime.lastError = {
+                      message: (result && result.error) || 'Install error'
+                    };
+                  }
+                  if (typeof cb === 'function') cb(code);
+                  delete window.chrome.runtime.lastError;
+                }
+              })
+              .catch((err) => {
+                window.chrome.runtime.lastError = { message: String(err || 'Install error') };
+                if (typeof cb === 'function') cb('install_error');
+                delete window.chrome.runtime.lastError;
+              });
+          },
+          completeInstall(_id, cb) {
+            Promise.resolve(pendingInstallPromise).then((result) => {
+              delete window.chrome.runtime.lastError;
+              if (typeof cb === 'function') cb();
+              if (result && result.ok && result.extensionInfo) {
+                onInstalledEvent._emit(result.extensionInfo);
+              }
+            });
+          },
+          getExtensionStatus(id, manifest, cb) {
+            const callback = typeof manifest === 'function' ? manifest : cb;
+            bridge
+              .getInstalled()
+              .then((list) => {
+                const found = Array.isArray(list) && list.some((item) => item.id === id);
+                if (typeof callback === 'function') {
+                  callback(found ? 'enabled' : 'installable');
+                }
+              })
+              .catch(() => {
+                if (typeof callback === 'function') callback('installable');
+              });
+          },
+          getIsLauncherEnabled(cb) {
+            if (typeof cb === 'function') setTimeout(() => cb(true), 0);
+          },
+          getBrowserLogin(cb) {
+            if (typeof cb === 'function') setTimeout(() => cb({ login: '' }), 0);
+          },
+          getStoreLogin(cb) {
+            if (typeof cb === 'function') setTimeout(() => cb(''), 0);
+          },
+          setStoreLogin(_login, cb) {
+            if (typeof cb === 'function') setTimeout(() => cb(), 0);
+          },
+          getWebGLStatus(cb) {
+            if (typeof cb === 'function') setTimeout(() => cb('webgl_allowed'), 0);
+          },
+          getReferrerChain(cb) {
+            if (typeof cb === 'function') setTimeout(() => cb(''), 0);
+          },
+          getMV2DeprecationStatus(cb) {
+            if (typeof cb === 'function') setTimeout(() => cb('inactive'), 0);
+          },
+          getFullChromeVersion(cb) {
+            if (typeof cb === 'function') {
+              setTimeout(() => cb({ version_number: '${CHROME_141_VERSION}' }), 0);
+            }
+          },
+          isInIncognitoMode(cb) {
+            if (typeof cb === 'function') setTimeout(() => cb(false), 0);
+          },
+          isPendingCustodianApproval(_id, cb) {
+            if (typeof cb === 'function') setTimeout(() => cb(false), 0);
+          },
+          shouldShowEnterprisePromotionBanner(cb) {
+            if (typeof cb === 'function') setTimeout(() => cb(false), 0);
+          }
+        };
+
+        Object.defineProperty(window.chrome, 'webstorePrivate', {
+          configurable: true,
+          get: () => webstorePrivateApi,
+          set: () => {}
+        });
+      })()`);
+    } catch {
+      // Ignore if contextBridge already bound in frame
+    }
+  }
 }

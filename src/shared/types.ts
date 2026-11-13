@@ -120,6 +120,7 @@ export interface InstalledExtension {
   name: string;
   version: string;
   description: string;
+  iconDataUrl?: string | null;
   popupPath: string | null;
   optionsPath: string | null;
   installPath: string;

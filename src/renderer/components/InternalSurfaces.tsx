@@ -162,8 +162,16 @@ export const InternalSurfaceView: React.FC<InternalSurfaceProps> = ({
                   className="px-4 py-3 flex items-center justify-between gap-3 hover:bg-ui-hover/50 ui-transition"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-ui-accentSoft text-ui-accent flex items-center justify-center font-semibold text-xs shrink-0">
-                      {ext.code.slice(0, 2)}
+                    <div className="w-8 h-8 rounded-lg bg-ui-accentSoft text-ui-accent flex items-center justify-center font-semibold text-xs shrink-0 overflow-hidden">
+                      {ext.iconDataUrl ? (
+                        <img
+                          src={ext.iconDataUrl}
+                          alt={ext.name}
+                          className="w-5 h-5 object-contain"
+                        />
+                      ) : (
+                        ext.code.slice(0, 2)
+                      )}
                     </div>
                     <div className="min-w-0">
                       <div className="text-sm font-medium text-ui-text truncate">

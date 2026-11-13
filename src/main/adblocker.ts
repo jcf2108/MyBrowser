@@ -130,25 +130,28 @@ export class NetworkShieldEngine {
     ses.webRequest.onBeforeSendHeaders((details, callback) => {
       const requestHeaders = { ...details.requestHeaders };
       let host = '';
+      let pathname = '';
+      let search = '';
       try {
-        host = new URL(details.url).hostname.toLowerCase();
+        const parsed = new URL(details.url);
+        host = parsed.hostname.toLowerCase();
+        pathname = parsed.pathname;
+        search = parsed.search;
       } catch {
         // Ignore URL parse error
       }
 
-      const isGoogleAuth =
-        host === 'accounts.google.com' ||
-        host.endsWith('.accounts.google.com') ||
-        details.url.includes('accounts.google.com');
+      // Only use Firefox desktop identity on interactive Google sign-in pages (/v3/signin, /signin, etc.),
+      // NEVER on passive SSO sync endpoints (/CheckCookie, /SetSID, /RotateCookiesPage, /ListAccounts, passive=true)
+      // so SetSID User-Agent hashes match www.google.com 100% and never trigger redirect loops.
+      const isInteractiveGoogleSignIn =
+        (host === 'accounts.google.com' || host.endsWith('.accounts.google.com')) &&
+        !/^\/(CheckCookie|SetSID|RotateCookiesPage|ListAccounts|PassiveLoginProber|gsi|o\/oauth2\/postmessageRelay)/i.test(
+          pathname
+        ) &&
+        !/[?&]passive=true\b/i.test(search);
 
-      const isChromeWebStore =
-        host === 'chromewebstore.google.com' ||
-        host === 'chrome.google.com' ||
-        host === 'clients2.google.com' ||
-        host === 'clients2.googleusercontent.com';
-
-      if (isGoogleAuth) {
-        // Use standard Firefox desktop identity for Google OAuth / Gmail sign-in so Google never blocks embedded Chromium / Electron
+      if (isInteractiveGoogleSignIn) {
         requestHeaders['User-Agent'] =
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0';
         for (const key of Object.keys(requestHeaders)) {
@@ -157,18 +160,22 @@ export class NetworkShieldEngine {
             delete requestHeaders[key];
           }
         }
-      } else if (isChromeWebStore) {
-        // Present Chrome 136 to Chrome Web Store so extensions requiring Chrome >= 134 are never marked unavailable
+      } else {
+        // Consistent modern Chrome 141 identity + Client Hints across Google Search, Gmail, Chrome Web Store, and the web
+        for (const key of Object.keys(requestHeaders)) {
+          if (key.toLowerCase().startsWith('sec-ch-ua')) {
+            delete requestHeaders[key];
+          }
+        }
         requestHeaders['User-Agent'] =
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.55 Safari/537.36';
         requestHeaders['sec-ch-ua'] =
-          '"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"';
+          '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"';
         requestHeaders['sec-ch-ua-mobile'] = '?0';
         requestHeaders['sec-ch-ua-platform'] = '"Windows"';
-      } else {
-        const realChrome = process.versions.chrome || '130.0.6723.116';
-        requestHeaders['User-Agent'] =
-          `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${realChrome} Safari/537.36`;
+        requestHeaders['sec-ch-ua-full-version'] = '"141.0.7390.55"';
+        requestHeaders['sec-ch-ua-full-version-list'] =
+          '"Google Chrome";v="141.0.7390.55", "Not?A_Brand";v="8.0.0.0", "Chromium";v="141.0.7390.55"';
       }
 
       if (this.state.enabled && this.state.strictPrivacyHeaders) {

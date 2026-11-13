@@ -336,17 +336,26 @@ export const App: React.FC = () => {
             </button>
           )}
 
-          {/* Installed Chrome Extension Action Badges (e.g. Bitwarden) */}
+          {/* Installed Chrome Extension Action Icons (e.g. Bitwarden) */}
           {state.extensions.map((ext) => (
             <button
               key={ext.id}
               type="button"
               onClick={() => actions.openExtensionPopup(ext.id)}
-              className="h-7 px-2 rounded-lg bg-ui-surface border border-ui-border text-ui-text hover:bg-ui-hover text-xs font-medium inline-flex items-center gap-1 ui-transition"
+              className="w-8 h-8 rounded-lg hover:bg-ui-hover flex items-center justify-center text-ui-text ui-transition"
               title={ext.name}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-ui-accent" />
-              <span>{ext.code.slice(0, 3)}</span>
+              {ext.iconDataUrl ? (
+                <img
+                  src={ext.iconDataUrl}
+                  alt={ext.name}
+                  className="w-4 h-4 rounded-sm object-contain"
+                />
+              ) : (
+                <span className="text-[10px] font-semibold text-ui-muted">
+                  {ext.code.slice(0, 2)}
+                </span>
+              )}
             </button>
           ))}
 

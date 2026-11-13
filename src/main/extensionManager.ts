@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog, Session } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import https from 'https';
+import crypto from 'crypto';
 import AdmZip from 'adm-zip';
 import { InstalledExtension } from '../shared/types';
 
@@ -27,7 +28,7 @@ export function extractCwsExtensionId(input: string): string | null {
   return null;
 }
 
-const CWS_COMPAT_CHROME_VERSION = '136.0.0.0';
+const CWS_COMPAT_CHROME_VERSION = '141.0.7390.55';
 
 function downloadBufferWithRedirects(url: string, maxRedirects = 6): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -72,6 +73,118 @@ function downloadBufferWithRedirects(url: string, maxRedirects = 6): Promise<Buf
 
     request(url, maxRedirects);
   });
+}
+
+function computeExtensionIdFromPubKey(pubKeyBytes: Buffer): string {
+  const hash = crypto.createHash('sha256').update(pubKeyBytes).digest();
+  let id = '';
+  for (let i = 0; i < 16; i++) {
+    id += String.fromCharCode(97 + ((hash[i] >> 4) & 0x0f));
+    id += String.fromCharCode(97 + (hash[i] & 0x0f));
+  }
+  return id;
+}
+
+function readVarint(buf: Buffer, offset: number): { value: number; next: number } | null {
+  let result = 0;
+  let shift = 0;
+  let pos = offset;
+  while (pos < buf.length && shift < 35) {
+    const byte = buf[pos++];
+    result |= (byte & 0x7f) << shift;
+    if ((byte & 0x80) === 0) {
+      return { value: result >>> 0, next: pos };
+    }
+    shift += 7;
+  }
+  return null;
+}
+
+function extractCrxPublicKeyBase64(crxBuffer: Buffer, expectedCwsId?: string): string | null {
+  if (
+    crxBuffer.length < 16 ||
+    crxBuffer[0] !== 0x43 ||
+    crxBuffer[1] !== 0x72 ||
+    crxBuffer[2] !== 0x32 ||
+    crxBuffer[3] !== 0x34
+  ) {
+    return null;
+  }
+
+  const version = crxBuffer.readUInt32LE(4);
+  if (version === 2) {
+    const pubKeyLength = crxBuffer.readUInt32LE(8);
+    if (16 + pubKeyLength <= crxBuffer.length) {
+      return crxBuffer.subarray(16, 16 + pubKeyLength).toString('base64');
+    }
+    return null;
+  }
+
+  if (version === 3) {
+    const headerSize = crxBuffer.readUInt32LE(8);
+    if (12 + headerSize > crxBuffer.length) return null;
+    const header = crxBuffer.subarray(12, 12 + headerSize);
+    let fallbackPubKey: Buffer | null = null;
+
+    let pos = 0;
+    while (pos < header.length) {
+      const tagInfo = readVarint(header, pos);
+      if (!tagInfo) break;
+      pos = tagInfo.next;
+      const wireType = tagInfo.value & 0x07;
+      const fieldNo = tagInfo.value >>> 3;
+
+      if (wireType === 2) {
+        const lenInfo = readVarint(header, pos);
+        if (!lenInfo || lenInfo.next + lenInfo.value > header.length) break;
+        const msg = header.subarray(lenInfo.next, lenInfo.next + lenInfo.value);
+        pos = lenInfo.next + lenInfo.value;
+
+        // CrxFileHeader fields 2 (sha256_with_rsa) and 3 (sha256_with_ecdsa) contain AsymmetricKeyProof { 1: bytes public_key }
+        if (fieldNo === 2 || fieldNo === 3) {
+          let innerPos = 0;
+          while (innerPos < msg.length) {
+            const innerTag = readVarint(msg, innerPos);
+            if (!innerTag) break;
+            innerPos = innerTag.next;
+            const innerWire = innerTag.value & 0x07;
+            const innerField = innerTag.value >>> 3;
+            if (innerWire === 2) {
+              const innerLen = readVarint(msg, innerPos);
+              if (!innerLen || innerLen.next + innerLen.value > msg.length) break;
+              const bytesVal = msg.subarray(innerLen.next, innerLen.next + innerLen.value);
+              innerPos = innerLen.next + innerLen.value;
+              if (innerField === 1 && bytesVal.length > 32) {
+                if (!fallbackPubKey) fallbackPubKey = bytesVal;
+                if (
+                  expectedCwsId &&
+                  computeExtensionIdFromPubKey(bytesVal) === expectedCwsId.toLowerCase()
+                ) {
+                  return bytesVal.toString('base64');
+                }
+              }
+            } else if (innerWire === 0) {
+              const skip = readVarint(msg, innerPos);
+              if (!skip) break;
+              innerPos = skip.next;
+            } else {
+              break;
+            }
+          }
+        }
+      } else if (wireType === 0) {
+        const skip = readVarint(header, pos);
+        if (!skip) break;
+        pos = skip.next;
+      } else {
+        break;
+      }
+    }
+
+    return fallbackPubKey ? fallbackPubKey.toString('base64') : null;
+  }
+
+  return null;
 }
 
 function stripCrxHeaderToZipBuffer(crxBuffer: Buffer): Buffer {
@@ -163,11 +276,66 @@ interface ParsedManifestInfo {
   name: string;
   version: string;
   description: string;
+  iconDataUrl: string | null;
   popupPath: string | null;
   optionsPath: string | null;
 }
 
-const CHROME_EXTENSION_API_SHIM = `/* __MYBROWSER_CHROME_SHIM__ */
+function resolveExtensionIconDataUrl(
+  extDir: string,
+  manifest: Record<string, any>
+): string | null {
+  const candidates: string[] = [];
+  const pushFromIconSpec = (spec: unknown) => {
+    if (!spec) return;
+    if (typeof spec === 'string') {
+      candidates.push(spec);
+      return;
+    }
+    if (typeof spec === 'object') {
+      const rec = spec as Record<string, string>;
+      for (const size of ['32', '48', '64', '128', '24', '19', '16']) {
+        if (typeof rec[size] === 'string') {
+          candidates.push(rec[size]);
+        }
+      }
+      for (const val of Object.values(rec)) {
+        if (typeof val === 'string') {
+          candidates.push(val);
+        }
+      }
+    }
+  };
+
+  pushFromIconSpec(manifest.action?.default_icon);
+  pushFromIconSpec(manifest.browser_action?.default_icon);
+  pushFromIconSpec(manifest.icons);
+
+  for (const rel of candidates) {
+    const cleanRel = rel.replace(/^\//, '');
+    const fullPath = path.join(extDir, cleanRel);
+    try {
+      if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+        const buf = fs.readFileSync(fullPath);
+        const ext = path.extname(fullPath).toLowerCase();
+        const mime =
+          ext === '.svg'
+            ? 'image/svg+xml'
+            : ext === '.webp'
+            ? 'image/webp'
+            : ext === '.jpg' || ext === '.jpeg'
+            ? 'image/jpeg'
+            : 'image/png';
+        return `data:${mime};base64,${buf.toString('base64')}`;
+      }
+    } catch {
+      // Try next icon candidate
+    }
+  }
+  return null;
+}
+
+const CHROME_EXTENSION_API_SHIM = `/* __MYBROWSER_CHROME_SHIM_V2__ */
 (function() {
   const g = typeof globalThis !== 'undefined' ? globalThis : self;
   if (!g.chrome) g.chrome = {};
@@ -185,10 +353,14 @@ const CHROME_EXTENSION_API_SHIM = `/* __MYBROWSER_CHROME_SHIM__ */
         obj[prop] = makeEvent();
         return obj[prop];
       }
+      const returnsArray =
+        typeof prop === 'string' &&
+        /^(getAll|query|getDynamicRules|getSessionRules|getRegisteredContentScripts|getContexts|search|getViews)$/i.test(prop);
       const fn = function(...args) {
+        const fallback = returnsArray ? [] : {};
         const cb = args[args.length - 1];
-        if (typeof cb === 'function') { try { cb({}); } catch {} }
-        return Promise.resolve({});
+        if (typeof cb === 'function') { try { cb(fallback); } catch {} }
+        return Promise.resolve(fallback);
       };
       obj[prop] = makeProxy(fn);
       return obj[prop];
@@ -219,8 +391,18 @@ function patchExtensionForElectronCompatibility(
   optionsPath: string | null
 ): void {
   try {
+    // Clean up legacy underscore-prefixed shim file if present (Chromium reserves leading "_")
+    const legacyShimPath = path.join(extDir, '__mybrowser_chrome_shim.js');
+    if (fs.existsSync(legacyShimPath)) {
+      try {
+        fs.unlinkSync(legacyShimPath);
+      } catch {
+        // Ignore
+      }
+    }
+
     // 1. Write standalone shim file into extension root for HTML pages (CSP script-src 'self' compliant)
-    const shimFileName = '__mybrowser_chrome_shim.js';
+    const shimFileName = 'mybrowser_chrome_shim.js';
     const shimFullPath = path.join(extDir, shimFileName);
     fs.writeFileSync(shimFullPath, CHROME_EXTENSION_API_SHIM, 'utf-8');
 
@@ -230,24 +412,32 @@ function patchExtensionForElectronCompatibility(
       const swPath = path.join(extDir, swRel.replace(/^\//, ''));
       if (fs.existsSync(swPath)) {
         const swContent = fs.readFileSync(swPath, 'utf-8');
-        if (!swContent.includes('__MYBROWSER_CHROME_SHIM__')) {
-          fs.writeFileSync(swPath, `${CHROME_EXTENSION_API_SHIM}\n${swContent}`, 'utf-8');
+        if (!swContent.includes('__MYBROWSER_CHROME_SHIM_V2__')) {
+          const cleaned = swContent.replace(
+            /\/\* __MYBROWSER_CHROME_SHIM__ \*\/[\s\S]*?\}\)\(\);\s*/m,
+            ''
+          );
+          fs.writeFileSync(swPath, `${CHROME_EXTENSION_API_SHIM}\n${cleaned}`, 'utf-8');
         }
       }
     }
 
-    // 3. Inject <script src="/__mybrowser_chrome_shim.js"></script> into popup and options HTML
+    // 3. Inject <script src="/mybrowser_chrome_shim.js"></script> into popup and options HTML
     for (const relHtml of [popupPath, optionsPath]) {
       if (!relHtml) continue;
       const htmlPath = path.join(extDir, relHtml);
       if (fs.existsSync(htmlPath)) {
-        const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
+        const htmlContent = fs
+          .readFileSync(htmlPath, 'utf-8')
+          .replace(/\/__mybrowser_chrome_shim\.js/g, `/${shimFileName}`);
         if (!htmlContent.includes(shimFileName)) {
           const scriptTag = `<script src="/${shimFileName}"></script>`;
           const patchedHtml = /<head[^>]*>/i.test(htmlContent)
             ? htmlContent.replace(/(<head[^>]*>)/i, `$1\n${scriptTag}`)
             : `${scriptTag}\n${htmlContent}`;
           fs.writeFileSync(htmlPath, patchedHtml, 'utf-8');
+        } else {
+          fs.writeFileSync(htmlPath, htmlContent, 'utf-8');
         }
       }
     }
@@ -291,6 +481,7 @@ function readExtensionManifest(extDir: string): ParsedManifestInfo {
 
   const cleanPopup = rawPopup ? String(rawPopup).replace(/^\//, '') : null;
   const cleanOptions = rawOptions ? String(rawOptions).replace(/^\//, '') : null;
+  const iconDataUrl = resolveExtensionIconDataUrl(extDir, manifest);
 
   patchExtensionForElectronCompatibility(extDir, manifest, cleanPopup, cleanOptions);
 
@@ -298,6 +489,7 @@ function readExtensionManifest(extDir: string): ParsedManifestInfo {
     name: rawName,
     version: String(manifest.version || '1.0.0'),
     description: rawDesc,
+    iconDataUrl,
     popupPath: cleanPopup,
     optionsPath: cleanOptions,
   };
@@ -354,8 +546,24 @@ export class ExtensionManager {
   }
 
   public async attachExtensionsToSession(ses: Session): Promise<void> {
+    let alreadyLoadedIds = new Set<string>();
+    let alreadyLoadedPaths = new Set<string>();
+    try {
+      const existing = ses.getAllExtensions();
+      alreadyLoadedIds = new Set(existing.map((e) => e.id));
+      alreadyLoadedPaths = new Set(existing.map((e) => path.resolve(e.path)));
+    } catch {
+      // Ignore if session extensions list unavailable
+    }
+
     for (const ext of this.extensions) {
       if (!ext.enabled || !fs.existsSync(ext.installPath)) continue;
+      if (
+        alreadyLoadedIds.has(ext.runtimeId) ||
+        alreadyLoadedPaths.has(path.resolve(ext.installPath))
+      ) {
+        continue;
+      }
       try {
         await ses.loadExtension(ext.installPath, { allowFileAccess: true });
       } catch {
@@ -400,6 +608,7 @@ export class ExtensionManager {
       name: info.name,
       version: info.version,
       description: info.description,
+      iconDataUrl: info.iconDataUrl,
       popupPath: info.popupPath,
       optionsPath: info.optionsPath,
       installPath: extDir,
@@ -438,6 +647,7 @@ export class ExtensionManager {
       )}&acceptformat=crx2,crx3&x=id%3D${encodeURIComponent(cwsId)}%26installsource%3Dondemand%26uc`;
 
       const crxBuffer = await downloadBufferWithRedirects(crxUrl);
+      const crxPubKeyBase64 = extractCrxPublicKeyBase64(crxBuffer, cwsId);
       const zipBuffer = stripCrxHeaderToZipBuffer(crxBuffer);
 
       const targetDir = path.join(this.extensionsDir, cwsId);
@@ -448,6 +658,24 @@ export class ExtensionManager {
 
       const zip = new AdmZip(zipBuffer);
       zip.extractAllTo(targetDir, true);
+
+      // Preserve the official Chrome Web Store extension ID by injecting the CRX public key into manifest.json
+      const extractedManifestPath = path.join(targetDir, 'manifest.json');
+      if (crxPubKeyBase64 && fs.existsSync(extractedManifestPath)) {
+        try {
+          const parsedManifest = JSON.parse(fs.readFileSync(extractedManifestPath, 'utf-8'));
+          if (!parsedManifest.key) {
+            parsedManifest.key = crxPubKeyBase64;
+            fs.writeFileSync(
+              extractedManifestPath,
+              JSON.stringify(parsedManifest, null, 2),
+              'utf-8'
+            );
+          }
+        } catch {
+          // Ignore if manifest rewrite fails
+        }
+      }
 
       const installed = await this.loadUnpackedDirectory(targetDir, cwsId);
       this.installing = false;
@@ -503,7 +731,9 @@ export class ExtensionManager {
   }
 
   public async removeExtension(extId: string): Promise<void> {
-    const target = this.extensions.find((e) => e.id === extId || e.runtimeId === extId);
+    const target = this.extensions.find(
+      (e) => e.id === extId || e.cwsId === extId || e.runtimeId === extId
+    );
     if (!target) return;
 
     for (const ses of this.getSessions()) {
