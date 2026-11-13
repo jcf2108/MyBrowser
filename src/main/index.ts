@@ -42,10 +42,6 @@ app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled');
 
 const REAL_CHROME_VERSION = process.versions.chrome || '130.0.6723.116';
 const DEFAULT_CHROME_UA = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${REAL_CHROME_VERSION} Safari/537.36`;
-const CWS_CHROME_136_UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
-const GOOGLE_AUTH_FIREFOX_UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0';
 
 app.userAgentFallback = DEFAULT_CHROME_UA;
 
@@ -236,21 +232,6 @@ class MyBrowserKernel {
     return ses;
   }
 
-  private applyUserAgentForUrl(webContents: Electron.WebContents, rawUrl: string): void {
-    try {
-      const host = new URL(rawUrl).hostname.toLowerCase();
-      if (host === 'accounts.google.com' || host.endsWith('.accounts.google.com')) {
-        webContents.setUserAgent(GOOGLE_AUTH_FIREFOX_UA);
-      } else if (host === 'chromewebstore.google.com' || host === 'chrome.google.com') {
-        webContents.setUserAgent(CWS_CHROME_136_UA);
-      } else {
-        webContents.setUserAgent(DEFAULT_CHROME_UA);
-      }
-    } catch {
-      webContents.setUserAgent(DEFAULT_CHROME_UA);
-    }
-  }
-
   private resolveUrlAndSecurity(rawInput: string): { url: string; securityState: SecurityState } {
     const trimmed = rawInput.trim();
 
@@ -307,14 +288,17 @@ class MyBrowserKernel {
         const enhanceCwsPage = () => {
           if (!document.body) return;
 
-          // 1. Hide "Passez à Chrome" or "Élément actuellement indisponible" banners
+          // 1. Hide "Passez à Chrome" or "Élément actuellement indisponible" leaf banners
           document.querySelectorAll('div, section, aside').forEach((el) => {
             const txt = (el.textContent || '').trim();
             if (
+              txt.length > 0 &&
+              txt.length < 220 &&
               (txt.includes('Passez à Chrome') ||
                 txt.includes('Switch to Chrome') ||
                 txt.includes('Élément actuellement indisponible') ||
                 txt.includes('This item is not available')) &&
+              !el.querySelector('main, c-wiz, [role="main"]') &&
               el.clientHeight > 18 &&
               el.clientHeight < 130
             ) {
@@ -424,22 +408,6 @@ class MyBrowserKernel {
         nodeIntegration: false,
         sandbox: false,
       },
-    });
-
-    this.applyUserAgentForUrl(view.webContents, tab.url);
-
-    view.webContents.on('will-navigate', (_e, url) => {
-      this.applyUserAgentForUrl(view.webContents, url);
-    });
-
-    view.webContents.on('will-redirect', (_e, url) => {
-      this.applyUserAgentForUrl(view.webContents, url);
-    });
-
-    view.webContents.on('did-start-navigation', (_e, url, _isInPlace, isMainFrame) => {
-      if (isMainFrame) {
-        this.applyUserAgentForUrl(view.webContents, url);
-      }
     });
 
     view.webContents.on('did-start-loading', () => {
@@ -673,7 +641,6 @@ class MyBrowserKernel {
 
     if (!resolved.url.startsWith('my://')) {
       const view = this.getOrCreateWebContentsView(tab);
-      this.applyUserAgentForUrl(view.webContents, resolved.url);
       view.webContents.loadURL(resolved.url).catch(() => {});
     }
 

@@ -2,6 +2,8 @@ import { ipcRenderer, webFrame } from 'electron';
 
 const FIREFOX_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0';
+const CWS_CHROME_136_UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
 
 // 1. On Google Sign-In (accounts.google.com), mask embedded Chromium indicators in Main World
 // so Google OAuth / Gmail login does not reject the browser with "This browser or app may not be secure"
@@ -39,6 +41,30 @@ if (
     })()`);
   } catch {
     // Ignore if main frame not ready
+  }
+}
+
+// 1b. On Chrome Web Store, expose Chrome 136 User-Agent in Main World without calling
+// webContents.setUserAgent mid-redirect (which would abort CWS redirects with ERR_ABORTED)
+if (
+  typeof window !== 'undefined' &&
+  /^(chromewebstore\.google\.com|chrome\.google\.com)$/i.test(window.location.hostname)
+) {
+  try {
+    webFrame.executeJavaScript(`(() => {
+      try {
+        Object.defineProperty(navigator, 'userAgent', {
+          get: () => '${CWS_CHROME_136_UA}',
+          configurable: true
+        });
+        Object.defineProperty(navigator, 'webdriver', {
+          get: () => false,
+          configurable: true
+        });
+      } catch {}
+    })()`);
+  } catch {
+    // Ignore if frame not ready
   }
 }
 
@@ -93,15 +119,18 @@ function setupChromeWebStoreEnhancer(): void {
   const enhancePage = () => {
     if (!document.body) return;
 
-    // A. Hide "Passez à Chrome" / "Élément actuellement indisponible" warning boxes
+    // A. Hide "Passez à Chrome" / "Élément actuellement indisponible" warning leaf banners
     document.querySelectorAll('div, section, aside').forEach((el) => {
       const htmlEl = el as HTMLElement;
       const txt = (htmlEl.textContent || '').trim();
       if (
+        txt.length > 0 &&
+        txt.length < 220 &&
         (txt.includes('Passez à Chrome') ||
           txt.includes('Switch to Chrome') ||
           txt.includes('Élément actuellement indisponible') ||
           txt.includes('This item is not available')) &&
+        !htmlEl.querySelector('main, c-wiz, [role="main"]') &&
         htmlEl.clientHeight > 16 &&
         htmlEl.clientHeight < 140
       ) {
