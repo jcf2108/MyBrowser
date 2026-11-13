@@ -18,26 +18,44 @@
   font-display: swap;
 }
 
-:root {
+:root,
+:root[data-theme='dark'] {
   color-scheme: dark;
-  --iso-bg: #121519;
-  --iso-panel: #1a1f26;
-  --iso-elevated: #212730;
-  --iso-line: #2a313c;
-  --iso-line-strong: #384252;
-  --iso-ink: #e6edf3;
-  --iso-ink-secondary: #9ba9bb;
-  --iso-ink-muted: #8c9db0;
-  --iso-accent: #ff5a26;
-  --iso-accent-ink: #0d1014;
-  --iso-signal: #2ea043;
-  --iso-warning: #d29922;
-  --iso-danger: #f85149;
+  --ui-shell: #141418;
+  --ui-surface: #1e1e24;
+  --ui-elevated: #26262e;
+  --ui-hover: #2a2a34;
+  --ui-border: rgba(255, 255, 255, 0.08);
+  --ui-text: #f4f4f6;
+  --ui-muted: #9898a6;
+  --ui-accent: #6366f1;
+  --ui-accent-hover: #818cf8;
+  --ui-accent-soft: rgba(99, 102, 241, 0.15);
+  --ui-viewport: #19191f;
+  --ui-success: #10b981;
+  --ui-danger: #ef4444;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --ui-shell: #eef0f5;
+  --ui-surface: #ffffff;
+  --ui-elevated: #f7f8fb;
+  --ui-hover: #e3e6ee;
+  --ui-border: rgba(15, 23, 42, 0.09);
+  --ui-text: #18181b;
+  --ui-muted: #646775;
+  --ui-accent: #4f46e5;
+  --ui-accent-hover: #4338ca;
+  --ui-accent-soft: rgba(79, 70, 229, 0.10);
+  --ui-viewport: #ffffff;
+  --ui-success: #059669;
+  --ui-danger: #dc2626;
 }
 
 * {
   box-sizing: border-box;
-  border-color: var(--iso-line);
+  border-color: var(--ui-border);
 }
 
 html,
@@ -47,17 +65,18 @@ body,
   width: 100%;
   margin: 0;
   padding: 0;
-  background-color: var(--iso-bg);
-  color: var(--iso-ink);
-  font-family: 'Archivo', system-ui, -apple-system, sans-serif;
+  background-color: var(--ui-shell);
+  color: var(--ui-text);
+  font-family: 'Archivo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-  caret-color: var(--iso-accent);
+  caret-color: var(--ui-accent);
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background-color: var(--iso-accent);
-  color: var(--iso-accent-ink);
+  background-color: var(--ui-accent);
+  color: #ffffff;
 }
 
 a {
@@ -68,57 +87,41 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
-/* Custom ISO technical scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--iso-bg);
-  border-left: 1px solid var(--iso-line);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--iso-line-strong);
+  background: rgba(148, 148, 161, 0.25);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--iso-accent);
+  background: rgba(148, 148, 161, 0.45);
 }
 
 :focus-visible {
-  outline: 1px solid var(--iso-accent);
-  outline-offset: -1px;
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 1px;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--iso-ink-muted);
-  opacity: 1;
+  color: var(--ui-muted);
+  opacity: 0.85;
 }
 
-/* Subtle engineering ruler ticks on top cartouche bar */
-.iso-ruler-bg {
-  background-image: repeating-linear-gradient(
-    90deg,
-    rgba(56, 66, 82, 0.38) 0px,
-    rgba(56, 66, 82, 0.38) 1px,
-    transparent 1px,
-    transparent 24px
-  );
-  background-size: 100% 4px;
-  background-repeat: no-repeat;
-  background-position: bottom left;
-}
-
-/* Authored exponential ease-out transition for spine & split-view */
-.iso-transition {
-  transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+.ui-transition {
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .iso-transition {
+  .ui-transition {
     transition: none !important;
   }
 }

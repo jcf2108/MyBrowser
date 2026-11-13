@@ -4,6 +4,7 @@ import {
   BrowserStateSnapshot,
   ConnectedApp,
   RightSidebarPanel,
+  ThemeMode,
   UserScriptRecipe,
   ViewportBoundsPayload,
 } from '../shared/types';
@@ -15,6 +16,10 @@ const api = {
     ipcRenderer.on('browser:state-changed', listener);
     return () => ipcRenderer.removeListener('browser:state-changed', listener);
   },
+
+  // Theme & Preferences
+  setTheme: (theme: ThemeMode) => ipcRenderer.invoke('browser:set-theme', theme),
+  setDefaultNewTabUrl: (url: string) => ipcRenderer.invoke('browser:set-default-new-tab-url', url),
 
   // Workspaces
   selectWorkspace: (workspaceId: string) => ipcRenderer.invoke('browser:select-workspace', workspaceId),

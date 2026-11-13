@@ -1,96 +1,109 @@
 ---
 name: MyBrowser
-description: Table à dessin d'ingénierie ISO et navigateur Chromium multi-vues à cartouches continus de 1px.
+description: Navigateur web Chromium minimaliste inspiré d'Arc et Zen Browser, à double thème Clair/Sombre et cadre périphérique apaisé.
 colors:
-  rotring-vermilion: "#ff5a26"
-  rotring-vermilion-hover: "#ff7142"
-  accent-contrast-ink: "#0d1014"
-  technical-emerald: "#2ea043"
-  amber-warning: "#d29922"
-  crimson-danger: "#f85149"
-  slate-drafting-bg: "#121519"
-  atelier-panel: "#1a1f26"
-  elevated-cartouche: "#212730"
-  iso-hairline: "#2a313c"
-  iso-line-strong: "#384252"
-  chalk-ink: "#e6edf3"
-  technical-slate-secondary: "#9ba9bb"
-  muted-blueprint-ink: "#8c9db0"
+  indigo-accent-dark: "#6366f1"
+  indigo-accent-hover-dark: "#818cf8"
+  indigo-accent-soft-dark: "rgba(99, 102, 241, 0.15)"
+  indigo-accent-light: "#4f46e5"
+  indigo-accent-hover-light: "#4338ca"
+  indigo-accent-soft-light: "rgba(79, 70, 229, 0.10)"
+  emerald-success-dark: "#10b981"
+  emerald-success-light: "#059669"
+  coral-danger-dark: "#ef4444"
+  coral-danger-light: "#dc2626"
+  obsidian-shell-dark: "#141418"
+  obsidian-viewport-dark: "#19191f"
+  velvet-surface-dark: "#1e1e24"
+  elevated-surface-dark: "#26262e"
+  hover-surface-dark: "#2a2a34"
+  hairline-border-dark: "rgba(255, 255, 255, 0.08)"
+  alabaster-text-dark: "#f4f4f6"
+  muted-slate-dark: "#9898a6"
+  pearl-shell-light: "#eef0f5"
+  daylight-surface-light: "#ffffff"
+  alabaster-elevated-light: "#f7f8fb"
+  hover-pearl-light: "#e3e6ee"
+  hairline-border-light: "rgba(15, 23, 42, 0.09)"
+  zinc-text-light: "#18181b"
+  muted-slate-light: "#646775"
 typography:
   display:
-    fontFamily: "'Archivo', system-ui, -apple-system, sans-serif"
-    fontSize: "18px"
-    fontWeight: 700
-    lineHeight: 1.375
+    fontFamily: "'Archivo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    fontSize: "20px"
+    fontWeight: 600
+    lineHeight: 1.4
     letterSpacing: "-0.025em"
   headline:
-    fontFamily: "'Archivo', system-ui, -apple-system, sans-serif"
-    fontSize: "14px"
-    fontWeight: 700
-    lineHeight: 1.4
-  title:
-    fontFamily: "'Archivo', system-ui, -apple-system, sans-serif"
-    fontSize: "12px"
+    fontFamily: "'Archivo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    fontSize: "16px"
     fontWeight: 600
-    lineHeight: 1.35
+    lineHeight: 1.5
+  title:
+    fontFamily: "'Archivo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    fontSize: "14px"
+    fontWeight: 500
+    lineHeight: 1.43
   body:
-    fontFamily: "'Archivo', system-ui, -apple-system, sans-serif"
+    fontFamily: "'Archivo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
     fontSize: "12px"
-    fontWeight: 400
+    fontWeight: 500
     lineHeight: 1.5
     fontFeature: "'cv02', 'cv03', 'cv04', 'cv11'"
   label:
-    fontFamily: "'Azeret Mono', ui-monospace, SFMono-Regular, monospace"
+    fontFamily: "'Archivo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
     fontSize: "11px"
-    fontWeight: 600
-    lineHeight: 1.25
+    fontWeight: 500
+    lineHeight: 1.35
     fontFeature: "'tnum'"
 rounded:
-  none: "0px"
+  md: "6px"
+  lg: "8px"
+  xl: "12px"
+  2xl: "16px"
+  full: "9999px"
 spacing:
-  px: "1px"
   xs: "4px"
   sm: "6px"
-  md: "8px"
-  lg: "10px"
-  xl: "14px"
+  md: "10px"
+  lg: "12px"
+  xl: "16px"
+  2xl: "24px"
   header-bar: "44px"
-  pane-cartouche: "36px"
-  rail-spine: "48px"
-  rail-expanded: "240px"
-  sidebar-right: "288px"
+  sidebar-left: "224px"
 components:
   button-primary:
-    backgroundColor: "{colors.rotring-vermilion}"
-    textColor: "{colors.accent-contrast-ink}"
-    typography: "{typography.title}"
-    rounded: "{rounded.none}"
-    padding: "6px 12px"
-  button-primary-hover:
-    backgroundColor: "{colors.rotring-vermilion-hover}"
-  button-elevated:
-    backgroundColor: "{colors.elevated-cartouche}"
-    textColor: "{colors.chalk-ink}"
-    typography: "{typography.title}"
-    rounded: "{rounded.none}"
-    padding: "4px 10px"
-  button-ghost:
-    backgroundColor: "{colors.slate-drafting-bg}"
-    textColor: "{colors.chalk-ink}"
+    backgroundColor: "{colors.indigo-accent-dark}"
+    textColor: "{colors.daylight-surface-light}"
     typography: "{typography.body}"
-    rounded: "{rounded.none}"
-    padding: "4px 8px"
+    rounded: "{rounded.xl}"
+    padding: "0px 14px"
+    height: "36px"
+  button-primary-hover:
+    backgroundColor: "{colors.indigo-accent-hover-dark}"
+  button-surface:
+    backgroundColor: "{colors.velvet-surface-dark}"
+    textColor: "{colors.alabaster-text-dark}"
+    typography: "{typography.body}"
+    rounded: "{rounded.xl}"
+    padding: "0px 12px"
+    height: "36px"
+  button-icon-ghost:
+    backgroundColor: "{colors.obsidian-shell-dark}"
+    textColor: "{colors.muted-slate-dark}"
+    rounded: "{rounded.lg}"
+    size: "32px"
   input-omnibox:
-    backgroundColor: "{colors.slate-drafting-bg}"
-    textColor: "{colors.chalk-ink}"
-    typography: "{typography.label}"
-    rounded: "{rounded.none}"
-    padding: "0px 8px"
-    height: "28px"
-  card-cartouche:
-    backgroundColor: "{colors.atelier-panel}"
-    textColor: "{colors.chalk-ink}"
-    rounded: "{rounded.none}"
+    backgroundColor: "{colors.velvet-surface-dark}"
+    textColor: "{colors.alabaster-text-dark}"
+    typography: "{typography.body}"
+    rounded: "{rounded.xl}"
+    padding: "0px 12px"
+    height: "32px"
+  card-surface:
+    backgroundColor: "{colors.velvet-surface-dark}"
+    textColor: "{colors.alabaster-text-dark}"
+    rounded: "{rounded.2xl}"
     padding: "14px"
 ---
 
@@ -98,157 +111,170 @@ components:
 
 ## Overview
 
-**Creative North Star: "Cartouche d'Atelier ISO"**
+**Creative North Star: "Le Cadre Apaisé Arc & Zen"**
 
-MyBrowser est conçu comme une table à dessin d'ingénierie ISO et un banc de pilotage Chromium où chaque vue web, chaque partition de session isolée et chaque port local (`127.0.0.1:port`) est encadré par un cartouche technique continu de `1px`. L'interface s'efface au profit des scènes WebGL2/WebGPU et des applications en développement grâce à une densité d'instrument de précision, sans jamais imposer d'applications tierces préconfigurées en dur.
+MyBrowser adopte l'architecture minimaliste, douce et silencieuse des navigateurs contemporains **Arc Browser** et **Zen Browser**. Plus de 95 % de la fenêtre appartient à la page web ou à l'application favorite de l'utilisateur (telle que `MySpot`), logée dans un cadre périphérique aux coins subtilement arrondis (`12px` / `rounded-xl`) qui détache délicatement le contenu de la coque du navigateur.
 
-Le système rejette explicitement le flou glassmorphique décoratif (`backdrop-filter`), les ombres portées diffuses, les rayons d'arrondi mous et les barres d'outils bureautiques grises génériques. Toute la hiérarchie repose sur des aplats mats neutres, une grille de filets continus orthogonaux et une signalétique Rotring où la couleur possède une signification opératoire stricte.
+Le système bannit toute surcharge textuelle, tout jargon technique d'ingénierie, les bordures carrées agressives et les panneaux latéraux imposés d'office. Chaque contrôle se limite à une icône limpide ou à un libellé de 1 à 3 mots. Une bascule instantanée entre le **Mode Sombre** (anthracite velouté `#141418`) et le **Mode Clair** (perle lumineux `#eef0f5`) adapte l'ensemble des surfaces via des variables CSS sémantiques (`--ui-*`) pilotées par l'attribut `data-theme` sur `<html>`.
 
 **Key Characteristics:**
-- Cartouches techniques continus de `1px` (`#2a313c`) à géométrie strictement orthogonale (`0px` de rayon).
-- Palette ardoise graphite neutre (`#121519` et `#1a1f26`) calibrée pour préserver la colorimétrie des rendus 3D WebGL2/WebGPU.
-- Signalétique d'instrument : Vermillon Rotring (`#ff5a26`) réservé au focus actif et Émeraude Technique (`#2ea043`) dédiée aux ports `127.0.0.1` en ligne et au bouclier réseau.
-- Colonne verticale repliable en tranche technique (« Spine » de `48px`) et double cadre Split-View (`CADRE A` / `CADRE B`) aligné au pixel près sur une ligne de base de `36px`.
-- Télémétrie tabulaire (`Azeret Mono`, `tabular-nums`) pour les ports TCP, latences, compteurs Adblock et coordonnées 3D.
+- Architecture **Arc / Zen** à cadre périphérique de `6px` (`px-1.5 pb-1.5`) entourant une vue web arrondie (`12px` / `rounded-xl`).
+- Double palette native **Sombre** (`data-theme="dark"`) et **Clair** (`data-theme="light"`) commutable en un clic depuis la barre supérieure ou les réglages.
+- Barre latérale gauche escamotable de `224px` (`w-56`) regroupant le sélecteur d'espaces, la grille de favoris rapides, le bouton `+ Nouvel onglet` et la liste verticale épurée des onglets.
+- Sobriété textuelle stricte : zéro paragraphe explicatif, zéro jargon protocole ou télémétrie intrusive, libellés courts (1 à 3 mots) et URL d'ouverture par défaut personnalisable.
+- Un unique accent **Indigo Doux** (`#6366f1` en sombre, `#4f46e5` en clair) réservé aux actions primaires, à l'espace actif et au focus clavier.
 
 ## Colors
 
-La palette combine des surfaces ardoise mates à dérive chromatique minimale avec des encres techniques franches inspirées des stylos tubulaires Rotring et des planches d'architecte ISO.
+La palette repose sur deux harmonies atmosphériques douces (Obsidienne Veloutée en mode Sombre, Perle Lumineuse en mode Clair) réconciliées sous des jetons CSS sémantiques (`--ui-shell`, `--ui-surface`, `--ui-elevated`, `--ui-hover`, `--ui-border`, `--ui-text`, `--ui-muted`, `--ui-accent`). Là où le contrat directionnel initial mentionnait des gris zinc génériques (`#18181b` / `#27272a` / `#f4f4f5`), l'implémentation finale les a affinés avec une légère teinte ardoise-indigo (`#141418` / `#1e1e24` en sombre ; `#eef0f5` / `#ffffff` en clair) qui adoucit le contraste autour du viewport web.
 
 ### Primary
-- **Vermillon Rotring** (`#ff5a26`): Couleur d'autorité focale utilisée exclusivement pour la partition d'espace active, le badge et le filet inférieur du cadre ayant le focus (`CADRE A // FOCUS` ou `CADRE B // FOCUS`), le bouton d'action primaire du panneau actif, le curseur de texte (`caret-color`) et le contour de focus clavier (`:focus-visible`).
-- **Vermillon Rotring Survol** (`#ff7142`): État de survol immédiat des déclencheurs primaires en Vermillon Rotring.
-- **Encre Contraste sur Vermillon** (`#0d1014`): Texte et icônes à fort contraste posés directement sur un fond `#ff5a26` (badges `[A]`, `[B]`, `CADRE A // FOCUS`, espace actif et sélection de texte `::selection`).
+- **Indigo Doux — Mode Sombre** (`#6366f1` / `--ui-accent`): Couleur d'action primaire utilisée pour l'espace de travail actif, les boutons de validation (`Enregistrer`, `Aller`, `Ajouter`, `Chrome Web Store`), les pilules d'état actif du bouclier, le cadre Split-View focalisé et le contour `:focus-visible`.
+- **Indigo Lumineux Survol — Mode Sombre** (`#818cf8` / `--ui-accent-hover`): État de survol des boutons primaires en thème sombre.
+- **Halo Indigo Translucide — Mode Sombre** (`rgba(99, 102, 241, 0.15)` / `--ui-accent-soft`): Fond doux des monogrammes de favoris et d'extensions en thème sombre.
+- **Indigo Profond — Mode Clair** (`#4f46e5` / `--ui-accent`): Accent primaire calibré pour garantir un contraste optimal sur les surfaces blanches du thème clair.
+- **Indigo Pressé Survol — Mode Clair** (`#4338ca` / `--ui-accent-hover`): État de survol des boutons primaires en thème clair.
+- **Halo Indigo Translucide — Mode Clair** (`rgba(79, 70, 229, 0.10)` / `--ui-accent-soft`): Fond doux des monogrammes de favoris et d'extensions en thème clair.
 
 ### Secondary
-- **Émeraude Technique** (`#2ea043`): Signal fonctionnel réservé aux ports locaux actifs sur `127.0.0.1`, à l'état actif du bouclier réseau Chromium (`BLK:count`), au badge secondaire `[B]` non focalisé et à la confirmation matérielle `WEBGL2 ACTIF · WEBGPU PRÊT`.
+- **Émeraude Calme — Mode Sombre** (`#10b981` / `--ui-success`) & **Mode Clair** (`#059669` / `--ui-success`): Jeton sémantique de confirmation positive disponible au niveau racine.
 
 ### Tertiary
-- **Ambre d'Alerte Hors-Ligne** (`#d29922`): Signal d'avertissement indiquant un port TCP local fermé (`FERMÉ`) ou la mise en pause du bouclier de filtrage.
-- **Rouge Critique de Révocation** (`#f85149`): Action destructive de fermeture d'onglet au survol ou de suppression d'un favori d'application / script utilisateur.
+- **Corail de Révocation — Mode Sombre** (`#ef4444` / `--ui-danger`) & **Mode Clair** (`#dc2626` / `--ui-danger`): Signal de suppression au survol des actions destructives (corbeille d'extension ou de favori).
 
 ### Neutral
-- **Ardoise Graphite de Fond** (`#121519`): Toile de fond principale du navigateur, des champs de saisie, des cellules de grille technique et du canevas CAO 3D.
-- **Panneau d'Atelier ISO** (`#1a1f26`): Surface structurelle de la barre supérieure (`44px`), du rail vertical (`240px` / `48px`), du panneau latéral droit (`288px`) et des conteneurs de section.
-- **Cartouche Surélevé** (`#212730`): Troisième échelon tonal utilisé pour l'onglet sélectionné, les boutons d'action secondaires renforcés et les commutateurs de mode actifs (`SPLIT A|B`, `APP`, `AGENT`, `SHIELD`).
-- **Filet Continu ISO 1px** (`#2a313c`): Ligne de structure universelle de `1px` séparant les barres, les cadres Split-View, les cellules de spécification et les lignes de liste.
-- **Filet Structurel Fort** (`#384252`): Bordure accentuée pour les déclencheurs surélevés (`button-elevated`), le curseur de barre de défilement et les repères d'angle du canevas 3D.
-- **Encre Blanc Craie** (`#e6edf3`): Texte primaire haute lisibilité pour les titres, URL actives, noms d'applications et arêtes extérieures du prisme 3D.
-- **Ardoise Technique Secondaire** (`#9ba9bb`): Métadonnées techniques, préfixes de protocole, étiquettes de formulaire, chemins d'URL secondaires et axe `Z+` du banc 3D.
-- **Encre Fantôme de Saisie** (`#8c9db0`): Texte d'invite (`::placeholder`) dans l'Omnibox et les champs de configuration.
+- **Coque Périphérique — Sombre** (`#141418`) / **Clair** (`#eef0f5` — `--ui-shell`): Arrière-plan global de la fenêtre encadrant la barre supérieure, la barre latérale gauche et le contour extérieur du viewport web.
+- **Toile du Viewport Web — Sombre** (`#19191f`) / **Clair** (`#ffffff` — `--ui-viewport`): Fond du conteneur central accueillant la page web ou les surfaces internes (`my://start`, `my://apps`, `my://extensions`, `my://privacy`).
+- **Surface de Carte & Contrôle — Sombre** (`#1e1e24`) / **Clair** (`#ffffff` — `--ui-surface`): Surface de la barre d'adresse Omnibox, de l'onglet actif, des tuiles de favoris, des cartes de réglages et des fenêtres modales.
+- **Surface Surélevée de Champ — Sombre** (`#26262e`) / **Clair** (`#f7f8fb` — `--ui-elevated`): Intérieur des champs de saisie dans les modales, sélecteurs segmentés et boutons secondaires.
+- **Surface de Survol — Sombre** (`#2a2a34`) / **Clair** (`#e3e6ee` — `--ui-hover`): État de survol doux des icônes de barre d'outils, des onglets inactifs et des lignes de liste.
+- **Filet Translucide — Sombre** (`rgba(255, 255, 255, 0.08)`) / **Clair** (`rgba(15, 23, 42, 0.09)` — `--ui-border`): Bordure subtile de `1px` délimitant le cadre web, l'Omnibox, les cartes et les séparateurs de liste sans jamais durcir le dessin.
+- **Encre Principale — Sombre** (`#f4f4f6`) / **Clair** (`#18181b` — `--ui-text`): Texte primaire des titres, onglets actifs et saisies.
+- **Encre Secondaire Apaisée — Sombre** (`#9898a6`) / **Clair** (`#646775` — `--ui-muted`): Icônes au repos, onglets inactifs, sous-titres d'URL et textes d'invite (`::placeholder` avec opacité `0.85`).
 
 ### Named Rules
 
-**The Rotring Focus Rule.** Le Vermillon Rotring (`#ff5a26`) signale un unique foyer d'attention actif à la fois : lorsque le `CADRE B` prend le focus en Split-View, le `CADRE A` perd son badge et son filet vermillon au profit d'un cartouche neutre (`#2a313c`).
+**The Dual-Theme Parity Rule.** Chaque composant utilise exclusivement les variables sémantiques `ui-*` (`var(--ui-shell)`, `var(--ui-surface)`, `var(--ui-border)`, `var(--ui-text)`, `var(--ui-muted)`, `var(--ui-accent)`). Aucune couleur neutre en dur ne doit briser la bascule instantanée entre `data-theme="dark"` et `data-theme="light"`.
 
-**The Colorimetric Neutrality Rule.** Les barres et panneaux périphériques restent strictement sur les trois gris ardoise (`#121519`, `#1a1f26`, `#212730`) sans dégradé coloré ni halo lumineux, afin de ne jamais altérer la perception des couleurs dans les scènes WebGL2/WebGPU.
+**The Single Quiet Accent Rule.** L'Indigo (`#6366f1` / `#4f46e5`) est le seul accent chromatique de l'interface. Il est réservé aux boutons d'action primaires, au commutateur d'espace actif, à l'indicateur d'outil ouvert et à la bordure du cadre actif en mode Split-View.
 
-**The Localhost Emerald Rule.** L'Émeraude Technique (`#2ea043`) ne sert jamais d'accent générique de marque ; elle atteste uniquement qu'un service local répond sur `127.0.0.1`, que le filtrage réseau est actif ou que le pipeline matériel GPU est opérationnel.
+**The Translucent Border Rule.** Les séparations de surfaces utilisent uniquement `--ui-border` (`8 %` de blanc en mode Sombre, `9 %` d'ardoise en mode Clair) afin que le cadre s'efface visuellement devant le contenu web.
 
 ## Typography
 
-**Display Font:** Archivo (with system-ui, -apple-system, sans-serif fallback)
-**Body Font:** Archivo (with system-ui, -apple-system, sans-serif fallback)
-**Label/Mono Font:** Azeret Mono (with ui-monospace, SFMono-Regular, monospace fallback)
+**Display Font:** Archivo (with system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif fallback)
+**Body Font:** Archivo (with system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif fallback)
+**Label/Mono Font:** Archivo (with tabular numerals `font-variant-numeric: tabular-nums`; `Azeret Mono` disponible en réserve)
 
-**Character:** L'association d'un grotesque technique nerveux (`Archivo` avec variantes OpenType `'cv02', 'cv03', 'cv04', 'cv11'`) et d'une chasse fixe d'ingénierie (`Azeret Mono`) donne à l'interface la lisibilité immédiate d'un cartouche de plan ISO et d'un analyseur de protocole.
+**Character:** Une typographie sans-serif unique, fluide et humaniste (`Archivo` lissée par `-webkit-font-smoothing: antialiased` avec variantes OpenType `'cv02', 'cv03', 'cv04', 'cv11'`), privilégiant des graisses moyennes (`500`) et semi-grasses (`600`) sans jamais recourir aux majuscules techniques ni aux blocs de texte denses.
 
 ### Hierarchy
-- **Display** (`700`, `18px` / `1.125rem`, `line-height: 1.375`, `letter-spacing: -0.025em`): Titre principal en tête des surfaces internes (`my://start`, `my://apps`, `my://agent`, `my://privacy`, `my://3d-lab`).
-- **Headline** (`700`, `14px` / `0.875rem`, `line-height: 1.4`): En-têtes de sections fonctionnelles (Registre des favoris, Passerelle API locale, Bibliothèque Userscripts, Tiroir d'édition).
-- **Title** (`600`, `12px` / `0.75rem`, `line-height: 1.35`): Intitulés d'onglets, noms d'applications connectées et libellés de boutons d'action.
-- **Body** (`400`, `12px` / `0.75rem`, `line-height: 1.5`, OpenType `'cv02', 'cv03', 'cv04', 'cv11'`): Descriptions opératoires et textes explicatifs limités à `68ch–70ch` pour préserver le confort de lecture.
-- **Label** (`600`, `10px–11px`, `line-height: 1.25`, `tabular-nums` en `Azeret Mono`): Codes ISO (`ISO-01`), préfixes d'Omnibox (`SYS // MY://`, `PORT // LOCAL`, `TLS // HTTPS`), ports TCP (`:3000`, `:4577`), compteurs (`BLK:14`) et étiquettes de champs en capitales.
+- **Display** (`600`, `20px` / `1.25rem`, `line-height: 1.4`, `letter-spacing: -0.025em`): Titre court en tête des pages internes (`Extensions`, `Favoris`, `Confidentialité`).
+- **Headline** (`600`, `16px` / `1rem`, `line-height: 1.5`): En-tête des fenêtres modales (`Réglages`, `Nouveau favori`, `Modifier le favori`) et titre de carte d'ouverture externe.
+- **Title** (`500`, `14px` / `0.875rem`, `line-height: 1.43`): Intitulés des lignes de paramètres, noms d'extensions ou de favoris, et champ de recherche principal sur `my://start`.
+- **Body** (`500` / `400`, `12px` / `0.75rem`, `line-height: 1.5`, OpenType `'cv02', 'cv03', 'cv04', 'cv11'`): Titres d'onglets dans la barre latérale, barre d'adresse Omnibox, libellés de boutons et champs de saisie secondaires.
+- **Label** (`500`, `11px`, `line-height: 1.35`, `tabular-nums`): Sélecteur d'espaces (`Perso`, `Pro`, `Lab`), pastille de version/mise à jour au pied de la barre latérale et monogrammes d'applications.
 
 ### Named Rules
 
-**The Tabular Telemetry Rule.** Tout compteur, numéro de port, temps de latence (`2ms`), horodatage ou angle en radians doit être composé en `Azeret Mono` avec `font-variant-numeric: tabular-nums` (`.tabular-nums`) pour interdire tout décalage horizontal lors des rafraîchissements.
+**The Zero-Bloat Copy Rule.** Les écrans n'affichent jamais de paragraphes d'explication ni de sous-titres descriptifs redondants. Les boutons et contrôles se limitent à 1 à 3 mots (`Nouvel onglet`, `Aller`, `Définir`, `Favori`, `Clair`, `Sombre`).
 
-**The Bracketed Code Rule.** Les identifiants courts d'applications, de cadres et de scripts sont encadrés de crochets droits en `Azeret Mono` gras (`[A]`, `[B]`, `[3DS]`, `[USR-01]`) afin de structurer le balayage visuel sans recourir à des favicons disparates.
+**The Natural Case Rule.** Toute la signalétique et la navigation s'écrivent en casse naturelle de phrase (« Nouvel onglet », « Confidentialité », « Adresse Web (URL) ») ; les intitulés tout en capitales et les préfixes techniques codés sont proscrits.
 
 ## Layout
 
-L'application occupe un cadre plein écran verrouillé (`100vw × 100vh`, `overflow: hidden`) structuré en quatre zones solidaires séparées par des filets de `1px` :
+L'interface s'organise autour d'un cadre plein écran sans défilement global (`100vw × 100vh`, `overflow: hidden`) conçu pour maximiser la surface utile de la page web :
 
-1. **Barre de Cartouche ISO Supérieure (`44px` / `h-11`)** : regroupe à gauche la bascule du rail (`SPINE` / `ISO-RAIL`), l'historique et le timbre de partition active ; au centre l'Omnibox (`max-w-3xl`, hauteur `28px`) ; à droite les commandes `SPLIT A|B`, `A⇄B`, `BLK`, `AGENT // :4577` et `Sidebar`. Sa bordure inférieure intègre une graduation de règle technique tous les `24px` (`.iso-ruler-bg`).
-2. **Rail Vertical d'Atelier (`240px` / `w-60` déplié, `48px` / `w-12` replié en Spine)** : divisé verticalement en trois compartiments (`ESPACES`, liste filtrable des `ONGLETS`, et dock `FAVORIS & PORTS`) conclus par un timbre de pied (`CHROMIUM` + `127.0.0.1:4577`). Le passage de `240px` à `48px` s'effectue via une transition exponentielle (`220ms cubic-bezier(0.16, 1, 0.3, 1)`). Sous le point de rupture `860px`, le rail bascule automatiquement en mode Spine compact de `48px`.
-3. **Aire Centrale Multi-Vues (Simple ou Split-View `A | B`)** : affiche soit un cadre unique (`100%`), soit deux cadres côte à côte (`splitRatio`, `50% / 50%` par défaut) séparés par un filet vertical de `1px`. Chaque cadre débute par un cartouche d'en-tête de `36px` (`h-9`) strictement aligné sur la même ligne de base horizontale.
-4. **Panneau Latéral Droit Persistant (`288px` / `w-72`)** : commutable entre trois outils (`APP`, `AGENT`, `SHIELD`) avec en-tête de `36px` aligné sur les cadres centraux. Masqué automatiquement sous `860px`.
-
-À l'intérieur des pages internes (`my://start`, `my://apps`, `my://agent`, `my://privacy`, `my://3d-lab`), le rythme spatial utilise un retrait de conteneur de `14px` (`p-3.5`), un espacement vertical de `14px` (`space-y-3.5`) et des grilles de spécification à joint de `1px` (`bg-iso-line gap-px`). Les formulaires en ligne sont limités à `2` colonnes maximum (`grid-cols-1 sm:grid-cols-2`) pour garantir zéro troncature horizontale lorsque la vue est scindée en Split-View (`340px–456px` par cadre).
+1. **Barre de Navigation Supérieure (`44px` / `h-11`, `px-2.5`)** :
+   - **Gauche** : 5 boutons d'icône carrés aux coins adoucis (`32px × 32px` / `w-8 h-8 rounded-lg`) pour afficher/masquer la barre latérale (`PanelLeft`), reculer (`ArrowLeft`), avancer (`ArrowRight`), actualiser (`RotateCw`) et revenir à l'URL d'accueil (`Home`).
+   - **Centre** : Barre d'adresse Omnibox centrée (`max-w-xl`, hauteur `32px` / `h-8`, `rounded-xl`) précédée d'une seule icône d'état (`Lock` ou `Globe`).
+   - **Droite** : Pastille de mise à jour (si disponible), badges d'extensions installées, et 5 boutons d'action (`32px × 32px`) : Extensions (`Puzzle`), Écran scindé (`Columns`), Bouclier (`Shield`), bascule Clair/Sombre (`Sun`/`Moon`) et Réglages (`SlidersHorizontal`).
+2. **Corps Principal Encadré (`px-1.5 pb-1.5 gap-1.5`)** : ménage une marge périphérique de `6px` en bas et sur les côtés afin que le viewport web flotte dans la coque `--ui-shell`.
+3. **Barre Latérale Gauche Escamotable (`224px` / `w-56`)** : lorsqu'elle est dépliée (`!state.spineCollapsed`), elle présente verticalement avec un rythme de `12px` (`space-y-3`) :
+   - Le commutateur segmenté des espaces de travail (`grid-cols-3 gap-1 p-1 rounded-xl`).
+   - La grille compacte des favoris épinglés (`grid-cols-4 gap-1.5`, tuiles de `36px` / `h-9 rounded-xl`).
+   - Le bouton pleine largeur `+ Nouvel onglet` (`h-9 px-3 rounded-xl`).
+   - La liste verticale défilante des onglets (`space-y-1`, lignes de `36px` / `h-9 px-2.5 rounded-xl`).
+   - Le pied de barre discret (`pt-2 border-t`) affichant la version courante (`v1.x · À jour`) et les raccourcis `Favoris` et `Réglages`.
+   Lorsqu'elle est repliée, la barre latérale disparaît complètement (`0px`), offrant 100 % de la largeur au cadre web.
+4. **Viewport Web Central (`flex-1`)** : vue unique par défaut (`100 %` de l'espace central) encadrée dans un conteneur `rounded-xl overflow-hidden bg-ui-viewport border border-ui-border shadow-sm`. En mode Split-View optionnel, deux cadres `rounded-xl` côte à côte partagent l'espace avec un écart de `6px` (`gap-1.5`) et une fine barre de titre de `28px` (`h-7`).
+5. **Pages Internes Centrées** :
+   - `my://start` : colonne unique centrée verticalement et horizontalement (`max-w-xl`, `space-y-8`, `px-6 py-12`) regroupant la barre de recherche (`h-12 rounded-2xl`), la rangée de favoris rapides et la carte de configuration de l'URL d'ouverture par défaut.
+   - `my://extensions`, `my://apps`, `my://privacy` : colonne centrée (`max-w-2xl mx-auto space-y-6`, `px-6 py-10`).
 
 ## Elevation & Depth
 
-MyBrowser adopte une stratification strictement plane et architecturale (« Flat-by-Design »). La profondeur ne provient jamais d'ombres portées ou de flous d'arrière-plan, mais de l'emboîtement précis de trois plans mats séparés par des filets continus de `1px` :
-- **Plan 0 — Fond de table (`#121519`)** : aire de travail, intérieur des champs, cellules de données et canevas 3D.
-- **Plan 1 — Panneau d'atelier (`#1a1f26`)** : barres structurelles, rail latéral et conteneurs de cartouche.
-- **Plan 2 — Contrôle surélevé (`#212730`)** : onglet actif, bouton secondaire d'action et commutateur engagé, cernés par un filet `#384252` ou `#ff5a26`.
+La profondeur repose sur l'encadrement tonal entre la coque périphérique (`--ui-shell`), la toile du viewport (`--ui-viewport`) et les cartes de contrôle (`--ui-surface`), complété par des ombres portées ultra-légères :
+
+### Shadow Vocabulary
+- **Subtle Surface Lift** (`box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05)` / `shadow-sm`): Appliqué au cadre du viewport web, à la barre d'adresse Omnibox, à l'onglet actif, aux tuiles de favoris et aux cartes de `my://start`.
+- **Modal Dialog Float** (`box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)` / `shadow-xl`): Réservé aux fenêtres modales centrées (`Réglages` et `Nouveau favori`) sur fond assombri `rgba(0, 0, 0, 0.5)` (`bg-black/50`).
 
 ### Named Rules
 
-**The Structural Hairline Rule.** Toute séparation de zone, de cellule tabulaire ou de composant s'effectue par un filet franc de `1px solid #2a313c` (ou `gap-px` sur fond `#2a313c`). Les ombres décoratives et le glassmorphisme sont proscrits.
+**The Framed Viewport Rule.** Le contenu web ne touche jamais les bords extérieurs de la fenêtre : il est toujours logé dans un conteneur `rounded-xl` (`12px`) séparé des bords par `6px` de coque `--ui-shell` et ceint d'un filet `--ui-border` avec `shadow-sm`.
 
-**The Dimmed Context Rule.** Lorsqu'un tiroir de configuration ou une création d'espace est actif, le rail et l'aire centrale abaissent leur opacité (`opacity-60` / `opacity-65`) et la passerelle Electron signale `overlayActive: true` aux `WebContentsView` natives.
+**The Overlay Sync Rule.** Dès qu'une fenêtre modale (`Réglages` ou `Favori`) est ouverte, `overlayActive` passe à `true` auprès du processus principal Electron afin que les `WebContentsView` natives cèdent proprement le premier plan aux dialogues React.
 
 ## Shapes
 
-Le langage formel obéit à l'orthogonalité d'un plan CAO ISO :
-- **Rayon d'arrondi nul (`0px`)** : tous les boutons, champs, badges, onglets, barres de défilement et panneaux ont des angles droits à `90°`.
-- **Contours de focus rentrants (`-1px`)** : l'état `:focus-visible` trace un cadre interne `outline: 1px solid #ff5a26` avec `outline-offset: -1px`, évitant tout débordement hors du filet de `1px`.
-- **Graduation et repères CAO** : la barre supérieure porte une règle graduée de `4px` de haut au pas de `24px` (`rgba(56, 66, 82, 0.38)`), et le canevas 3D intègre une grille de `24px` ainsi que des équerres de calage de `12px` dans les angles (`#384252`).
-- **Barres de défilement techniques (`6px`)** : piste `#121519` bordée d'un filet gauche de `1px` (`#2a313c`) et curseur rectangulaire `#384252` passant à `#ff5a26` au survol.
+Le système utilise une géométrie douce à rayons concentriques :
+- **Conteneurs majeurs & Modales (`16px` / `rounded-2xl`)** : grande barre de recherche de `my://start` (`h-12`), carte de l'URL par défaut et boîtes de dialogue modales (`max-w-md`).
+- **Cadre Web, Omnibox, Onglets & Cartes (`12px` / `rounded-xl`)** : rayon signature appliqué au cadre du viewport web, à la barre d'adresse centrale (`h-8`), aux onglets verticaux (`h-9`), aux tuiles de favoris (`h-9` / `h-10`), aux listes groupées et aux champs de formulaire.
+- **Boutons d'icône & Segments (`8px` / `rounded-lg`)** : boutons d'outils de la barre supérieure (`32px × 32px`), segments d'espaces de travail (`h-7`) et boutons d'action secondaires.
+- **Micro-badges & Fermeture (`6px` / `rounded-md`)** : bouton de fermeture d'onglet au survol (`20px × 20px` / `w-5 h-5`) et vignette monogramme (`w-5 h-5`).
+- **Pilules d'état & Défilement (`9999px` / `rounded-full`)** : commutateurs `Actif` / `Inactif` de la page Confidentialité, compteur de traqueurs bloqués et curseurs de barres de défilement (`6px` de large).
 
 ## Components
 
-Chaque composant se comporte comme une pièce d'instrumentation : compacte, encadrée au pixel près et dépourvue d'ornement superflu.
+Chaque composant privilégie la douceur tactile, la concision visuelle et la réactivité (`transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1)` via `.ui-transition`).
 
 ### Buttons
-- **Shape:** Angles droits stricts (`0px` radius), hauteur compacte de `28px` (`h-7`) dans les barres d'outils ou retrait interne `6px 12px` (`px-3 py-1.5`) dans les panneaux.
-- **Primary:** Fond Vermillon Rotring (`#ff5a26`), texte Encre Contraste (`#0d1014`), police `Archivo` `12px` SemiBold (`600`), réservé à l'action majeure du cadre ayant le focus.
-- **Hover / Focus:** Survol primaire en `#ff7142` ; survol des boutons techniques par bascule de la bordure de `#2a313c` vers `#ff5a26` ; focus clavier par filet interne de `1px` `#ff5a26`.
-- **Secondary / Ghost / Tertiary:**
-  - **Elevated Technical (`button-elevated`)** : fond `#212730`, bordure `1px solid #384252`, texte `#e6edf3` (`600`), utilisé pour `+ Onglet`, `+ App`, `Créer`, `Extraire`.
-  - **Ghost Cartouche (`button-ghost`)** : fond `#121519` ou `#1a1f26`, bordure `1px solid #2a313c`, texte `#9ba9bb` passant à `#e6edf3` et bordure `#ff5a26` au survol.
+- **Shape:** Coins adoucis de `12px` (`rounded-xl`) pour les actions de formulaire et de barre latérale (`h-9` / `36px`), ou `8px` (`rounded-lg`) pour les boutons compacts (`h-7` / `28px`, `h-8` / `32px`).
+- **Primary:** Fond `--ui-accent` (`#6366f1` sombre / `#4f46e5` clair), texte blanc `#ffffff`, police `Archivo` `12px` Medium (`500`), utilisé pour `Enregistrer`, `Définir`, `Aller`, `Ajouter` et `Chrome Web Store`.
+- **Hover / Focus:** Survol primaire vers `--ui-accent-hover` (`#818cf8` sombre / `#4338ca` clair) ; contour clavier `:focus-visible` de `2px solid var(--ui-accent)` avec `outline-offset: 1px`.
+- **Secondary / Ghost / Icon:**
+  - **Surface Action (`button-surface`)** : fond `--ui-surface`, bordure `1px solid var(--ui-border)`, ombre `shadow-sm`, texte `--ui-text`, survol `--ui-hover` (ex. `+ Nouvel onglet`, `Dossier local`, `Installer`).
+  - **Toolbar Icon Ghost (`button-icon-ghost`)** : carré `32px × 32px` (`w-8 h-8 rounded-lg`), icône `16px` en `--ui-muted` passant à `--ui-text` sur fond `--ui-hover` au survol, ou `bg-ui-surface text-ui-accent shadow-sm` lorsque la vue correspondante est active.
 
 ### Chips
-- **Style:** Rectangles orthogonaux sans arrondi (`0px`), typographie `Azeret Mono` `10px–11px` Bold (`700`), retrait `2px 6px`.
+- **Style:** Pilules `rounded-full` (`h-7 px-3`) ou badges compacts `rounded-lg` (`h-7 px-2`) en `12px` Medium (`500`).
 - **State:**
-  - **Focus de cadre (`CADRE A // FOCUS`, `[A]`)** : fond plein `#ff5a26`, texte `#0d1014`.
-  - **Cadre secondaire actif (`[B]`)** : fond plein `#2ea043`, texte `#0d1014` (ou `#ff5a26` lorsque le Cadre B détient le focus).
-  - **Cadre en veille (`CADRE B // COMPARAISON`)** : fond `#1a1f26`, bordure `1px solid #2a313c`, texte `#9ba9bb`.
+  - **Privacy Toggle Pill** : fond `--ui-accent` et texte `#ffffff` à l'état `Actif` ; fond `--ui-elevated`, bordure `--ui-border` et texte `--ui-muted` à l'état `Inactif`.
+  - **Extension Badge** : fond `--ui-surface`, bordure `--ui-border`, pastille ronde `6px` (`w-1.5 h-1.5 rounded-full bg-ui-accent`) suivie du code court de l'extension.
 
 ### Cards / Containers
-- **Corner Style:** Orthogonal (`0px` radius).
-- **Background:** Panneau d'atelier `#1a1f26` avec sous-cellules `#121519`.
-- **Shadow Strategy:** Aucune ombre portée ; séparation par filets structurels de `1px`.
-- **Border:** Filet continu `1px solid #2a313c` avec en-têtes internes soulignés par `border-b border-iso-line`.
-- **Internal Padding:** `14px` (`p-3.5`) pour les blocs principaux, `10px` (`p-2.5`) pour les lignes d'applications et panneaux latéraux.
+- **Corner Style:** `16px` (`rounded-2xl`) pour les cartes d'accueil et modales ; `12px` (`rounded-xl`) pour les listes groupées (`divide-y divide-ui-border`).
+- **Background:** `--ui-surface` (`#1e1e24` sombre / `#ffffff` clair).
+- **Shadow Strategy:** `shadow-sm` sur les cartes de surface ; `shadow-xl` sur les modales.
+- **Border:** `1px solid var(--ui-border)`.
+- **Internal Padding:** `14px` (`p-3.5`) pour la carte d'URL par défaut, `16px × 12px` (`px-4 py-3`) pour les lignes de liste, `20px` (`p-5`) pour les modales.
 
 ### Inputs / Fields
-- **Style:** Fond `#121519`, bordure `1px solid #2a313c`, rayon `0px`, texte `#e6edf3`, invite `#8c9db0`. L'Omnibox centrale (`h-7` / `28px`) associe un préfixe de protocole à gauche (`SYS // MY://`, `PORT // LOCAL`, `TLS // HTTPS`), un champ `Azeret Mono` `12px` au centre et un déclencheur `+ App` à droite.
-- **Focus:** La bordure du conteneur ou du champ passe immédiatement à `#ff5a26` (`focus-within:border-iso-accent` ou `:focus-visible`), avec curseur `#ff5a26`.
-- **Inline Port Field:** Champ numérique compact (`w-20`, `px-1.5 py-0.5`, `Azeret Mono` `11px` `tabular-nums`) permettant de modifier le port TCP d'une application locale directement depuis la liste des favoris.
+- **Style:**
+  - **Top Omnibox (`input-omnibox`)** : hauteur `32px` (`h-8`), `rounded-xl`, fond `--ui-surface`, bordure `1px solid var(--ui-border)`, icône `14px` (`Lock` ou `Globe`) à gauche, texte `12px` `--ui-text` avec sélection automatique au focus.
+  - **Start Search Bar** : hauteur `48px` (`h-12`), `rounded-2xl`, fond `--ui-surface`, icône `Search` à gauche et bouton `Aller` (`h-8 rounded-xl bg-ui-accent`) intégré à droite.
+  - **Modal & Card Inputs** : hauteur `36px` (`h-9`) ou `40px` (`h-10`), `rounded-xl`, fond `--ui-elevated`, bordure `--ui-border`.
+- **Focus:** La bordure passe à `--ui-accent` (`focus:border-ui-accent` ou `focus-within:border-ui-accent`) avec curseur `--ui-accent`.
 
 ### Navigation
-- **Top ISO Cartouche Bar (`44px`):** Barre horizontale fixe sur `#1a1f26` avec graduation `.iso-ruler-bg`, combinant bascule `SPINE` / `ISO-RAIL`, navigation historique groupée, badge de partition active, Omnibox et commutateurs de vues (`SPLIT A|B`, `A⇄B`, `BLK`, `AGENT // :4577`, `Sidebar`).
-- **Vertical Drafting Rail & Technical Spine (`240px` ↔ `48px`):** En mode déplié (`240px`), affiche la grille à 3 colonnes des partitions `ISO-01..03`, les onglets verticaux filtrables avec actions rapides (`Split`, `Pin`, `Fermer`) et le dock des favoris/ports. En mode replié (`48px`), condense chaque espace, onglet (`T1 A`, `T2 B`) et application (`3DS` + pastille d'état `6px`) en une colonne de timbres carrés de `36px` de large (`w-9`).
-- **Shared-Baseline Split-View Headers (`36px`):** Barres jumelles en tête du `CADRE A` et du `CADRE B`, garantissant un alignement horizontal parfait en mode écran scindé.
+- **Collapsible Arc/Zen Sidebar (`224px`):** Regroupe le sélecteur segmenté à 3 espaces (`h-7 rounded-lg`, espace actif en `bg-ui-accent text-white`), 3 tuiles de favoris + 1 bouton `+` en grille `grid-cols-4`, le déclencheur `+ Nouvel onglet`, et la liste verticale des onglets (`h-9 px-2.5 rounded-xl`, onglet actif sur `bg-ui-surface border border-ui-border shadow-sm`, bouton de fermeture `X` révélé uniquement au survol `opacity-0 group-hover:opacity-100`).
+- **Top Minimalist Bar (`44px`):** Regroupe les contrôles de navigation à gauche, l'Omnibox au centre et les 5 icônes d'outils à droite (dont la bascule directe Clair/Sombre et l'ouverture de la modale `Réglages`).
 
-### Interactive 3D CAD Viewport (`IsoCadCanvas`)
-- **Rôle & Comportement:** Composant signature attestant l'accélération matérielle WebGL2/WebGPU de Chromium (`my://start` en mode compact `192px` / `h-48` et `my://3d-lab` en mode plein cadre `320px` / `h-80`).
-- **Structure Visuelle:** Fond `#121519` quadrillé au pas de `24px` (`rgba(42, 49, 60, 0.55)`), équerres de calage `#384252`, axes `X+ [127.0.0.1]` (`#ff5a26`), `Y+ [WEBGPU]` (`#2ea043`) et `Z+ [ISO-01]` (`#9ba9bb`), prisme extérieur `#e6edf3` et noyau double moteur `#ff5a26` reliés par des vecteurs de tension en pointillés, accompagnés d'un pied de contrôle `Azeret Mono` pour l'azimut et l'inclinaison en radians (`tabular-nums`).
+### Custom Default New Tab Card (`my://start` & Modal `Réglages`)
+- **Rôle & Comportement:** Composant signature permettant de définir en un clic l'URL ouverte automatiquement à chaque nouvel onglet (ex. `https://myspot.app` ou un serveur local `http://127.0.0.1:3000`).
+- **Structure Visuelle:** Carte `rounded-2xl bg-ui-surface border border-ui-border p-3.5 shadow-sm` réunissant un en-tête concis avec icône `Globe` en `--ui-accent` (et bouton `Par défaut` si une URL personnalisée est active), un champ `h-9 rounded-xl bg-ui-elevated`, un bouton primaire `Définir` (affichant `Enregistré` avec coche pendant `1800ms`) et un bouton rapide `Ouvrir`.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** encadrer chaque zone, barre, cellule de télémétrie et carte par un filet continu de `1px solid #2a313c` avec un rayon d'arrondi de `0px`.
-- **Do** réserver le Vermillon Rotring (`#ff5a26`) au seul cadre détenant le focus actif (`CADRE A` ou `CADRE B`), à l'espace de travail sélectionné et au déclencheur primaire du panneau focalisé.
-- **Do** appliquer `Azeret Mono` avec `tabular-nums` sur tous les numéros de ports TCP (`:3000`, `:4577`), compteurs de blocage (`BLK:14`), latences et valeurs angulaires.
-- **Do** maintenir l'alignement horizontal strict des cartouches d'en-tête de `36px` (`h-9`) entre le `CADRE A`, le `CADRE B` et le panneau latéral droit.
-- **Do** limiter les formulaires internes à un maximum de `2` colonnes (`sm:grid-cols-2`) afin que chaque champ reste intégralement lisible en mode Split-View (`340px–456px` de large).
+- **Do** utiliser systématiquement les jetons sémantiques `ui-*` (`bg-ui-shell`, `bg-ui-surface`, `bg-ui-elevated`, `border-ui-border`, `text-ui-text`, `text-ui-muted`, `bg-ui-accent`) pour préserver l'intégrité des thèmes Clair et Sombre.
+- **Do** maintenir le cadre périphérique de `6px` (`px-1.5 pb-1.5 gap-1.5`) et le rayon `rounded-xl` (`12px`) autour du viewport web afin de conserver la signature visuelle Arc / Zen.
+- **Do** rédiger tous les libellés d'interface en français ultra-concis (1 à 3 mots maximum par bouton ou contrôle) sans paragraphe explicatif.
+- **Do** laisser le navigateur s'ouvrir en vue simple par défaut (95 % de la surface dédiée au web), le mode Split-View et les modales n'apparaissant qu'à la demande explicite de l'utilisateur.
 
 ### Don't:
-- **Don't** introduire de flou glassmorphique (`backdrop-filter`), de dégradés atmosphériques ou de teintes colorées dans les panneaux `#121519` / `#1a1f26` qui fausseraient la colorimétrie des vues 3D.
-- **Don't** appliquer d'arrondis (`border-radius > 0`) sur les boutons, onglets, badges ou champs de saisie.
-- **Don't** utiliser l'Émeraude Technique (`#2ea043`) comme couleur décorative en dehors des états réseau actifs (`127.0.0.1` en ligne, bouclier Adblock actif, pipeline WebGL2/WebGPU prêt).
-- **Don't** imposer d'applications tierces verrouillées en dur : la liste des applications connectées doit toujours pouvoir être modifiée ou vidée en un clic (`Profil vierge`).
+- **Don't** réintroduire d'angles droits (`0px`), de bordures opaques criardes, de règles graduées ou de jargon technique d'atelier dans l'interface.
+- **Don't** surcharger les écrans internes ou les modales avec des sous-titres descriptifs, des blocs d'aide ou des compteurs de télémétrie permanente dans la barre supérieure.
+- **Don't** utiliser les anciens alias `iso-*` ou le composant orphelin `IsoCadCanvas.tsx` sur de nouvelles surfaces.
+- **Don't** imposer d'application tierce verrouillée : l'URL de nouvel onglet et les favoris restent toujours librement personnalisables ou réinitialisables par l'utilisateur.

@@ -52,7 +52,8 @@ Contrairement aux navigateurs généralistes figés ou aux navigateurs spéciali
 ## Brand Commitments
 
 - **Nom du projet** : `MyBrowser`
-- **Langue de l'interface** : Français (clair, précis, orienté productivité technique).
+- **Langue de l'interface** : Français (ultra-concis : 1 à 3 mots par contrôle, icônes claires, zéro surcharge textuelle ni paragraphes explicatifs).
+- **Direction visuelle de référence (Canon imposé par l'utilisateur)** : Minimalisme sobre, moderne et doux inspiré de **Arc Browser** et **Zen Browser** — barre latérale gauche épurée et escamotable pour les onglets et favoris rapides, barre de navigation supérieure fine avec champ d'adresse arrondi, bascule Thème Clair / Sombre en un clic, URL de nouvel onglet par défaut personnalisable (ex. application web personnelle `MySpot`), vue simple par défaut (95 % de l'écran dédié à la page web, sans Split-View ni panneaux techniques ouverts d'office).
 
 ## Evidence on Hand
 

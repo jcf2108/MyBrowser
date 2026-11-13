@@ -14,6 +14,7 @@ import {
   ConnectedApp,
   RightSidebarPanel,
   SecurityState,
+  ThemeMode,
   UserScriptRecipe,
   ViewportBoundsPayload,
   Workspace,
@@ -53,17 +54,19 @@ class MyBrowserKernel {
   private views = new Map<string, WebContentsView>();
   private companionView: WebContentsView | null = null;
 
+  private theme: ThemeMode = 'dark';
+  private defaultNewTabUrl = 'my://start';
   private workspaces: Workspace[] = [...DEFAULT_WORKSPACES];
   private activeWorkspaceId = 'ws-atelier';
   private tabs: BrowserTab[] = [...DEFAULT_TABS];
   private activeTabId = 'tab-start';
-  private splitMode = true;
-  private secondaryTabId: string | null = 'tab-apps';
+  private splitMode = false;
+  private secondaryTabId: string | null = null;
   private focusedPane: 'primary' | 'secondary' = 'primary';
-  private splitRatio = 0.54;
+  private splitRatio = 0.5;
   private spineCollapsed = false;
-  private rightSidebarPanel: RightSidebarPanel = 'agent';
-  private companionAppId: string | null = 'app-local-dev';
+  private rightSidebarPanel: RightSidebarPanel = 'none';
+  private companionAppId: string | null = null;
   private companionCustomUrl: string | null = null;
 
   private connectedApps: ConnectedApp[] = [...DEFAULT_CONNECTED_APPS];
@@ -114,11 +117,27 @@ class MyBrowserKernel {
     try {
       if (fs.existsSync(this.configPath)) {
         const raw = JSON.parse(fs.readFileSync(this.configPath, 'utf-8'));
+        if (raw.theme === 'light' || raw.theme === 'dark') {
+          this.theme = raw.theme;
+        }
+        if (typeof raw.defaultNewTabUrl === 'string' && raw.defaultNewTabUrl.trim()) {
+          this.defaultNewTabUrl = raw.defaultNewTabUrl.trim();
+        }
         if (Array.isArray(raw.connectedApps)) {
-          this.connectedApps = raw.connectedApps;
+          const isLegacyIsoApps = raw.connectedApps.some(
+            (a: ConnectedApp) => a.id === 'app-studio-3d' || a.id === 'app-hub-api'
+          );
+          if (!isLegacyIsoApps) {
+            this.connectedApps = raw.connectedApps;
+          }
         }
         if (Array.isArray(raw.workspaces) && raw.workspaces.length > 0) {
-          this.workspaces = raw.workspaces;
+          const isLegacyIsoWs = raw.workspaces.some((w: Workspace) =>
+            String(w.code || '').startsWith('ISO-')
+          );
+          if (!isLegacyIsoWs) {
+            this.workspaces = raw.workspaces;
+          }
         }
         if (Array.isArray(raw.scripts) && raw.scripts.length > 0) {
           this.scripts = raw.scripts;
@@ -126,6 +145,14 @@ class MyBrowserKernel {
       }
     } catch {
       // Fallback to defaults if config file is corrupted
+    }
+
+    if (this.defaultNewTabUrl && this.defaultNewTabUrl !== 'my://start' && this.tabs.length > 0) {
+      const resolved = this.resolveUrlAndSecurity(this.defaultNewTabUrl);
+      this.tabs[0].url = resolved.url;
+      this.tabs[0].securityState = resolved.securityState;
+      this.tabs[0].title = this.inferInitialTitle(resolved.url);
+      this.tabs[0].isLoading = !resolved.url.startsWith('my://');
     }
   }
 
@@ -136,6 +163,8 @@ class MyBrowserKernel {
         this.configPath,
         JSON.stringify(
           {
+            theme: this.theme,
+            defaultNewTabUrl: this.defaultNewTabUrl,
             connectedApps: this.connectedApps,
             workspaces: this.workspaces,
             scripts: this.scripts,
@@ -152,12 +181,12 @@ class MyBrowserKernel {
 
   public initWindow(): void {
     this.mainWindow = new BrowserWindow({
-      width: 1520,
-      height: 940,
-      minWidth: 1024,
-      minHeight: 680,
-      backgroundColor: '#121519',
-      title: 'MyBrowser — Poste de Pilotage Chromium ISO',
+      width: 1480,
+      height: 920,
+      minWidth: 960,
+      minHeight: 640,
+      backgroundColor: '#141417',
+      title: 'MyBrowser',
       autoHideMenuBar: true,
       webPreferences: {
         preload: path.join(__dirname, '../preload/index.js'),
@@ -537,6 +566,8 @@ class MyBrowserKernel {
       chromiumVersion: process.versions.chrome || '130.0.6723.116',
       electronVersion: process.versions.electron || '33.2.0',
       nodeVersion: process.versions.node || '22.23.3',
+      theme: this.theme,
+      defaultNewTabUrl: this.defaultNewTabUrl,
       workspaces: this.workspaces,
       activeWorkspaceId: this.activeWorkspaceId,
       tabs: this.tabs,
@@ -568,9 +599,13 @@ class MyBrowserKernel {
     }
   }
 
-  public createTab(rawUrl = 'my://start', workspaceId?: string, inSplit = false): BrowserTab {
+  public createTab(rawUrl?: string, workspaceId?: string, inSplit = false): BrowserTab {
     const wsId = workspaceId || this.activeWorkspaceId;
-    const resolved = this.resolveUrlAndSecurity(rawUrl);
+    const effectiveUrl =
+      rawUrl && rawUrl.trim() && rawUrl.trim() !== 'default'
+        ? rawUrl.trim()
+        : this.defaultNewTabUrl || 'my://start';
+    const resolved = this.resolveUrlAndSecurity(effectiveUrl);
     const newTab: BrowserTab = {
       id: `tab-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       workspaceId: wsId,
@@ -606,13 +641,18 @@ class MyBrowserKernel {
   }
 
   private inferInitialTitle(url: string): string {
-    if (url === 'my://start') return 'Planche de Pilotage ISO — MyBrowser';
-    if (url === 'my://apps') return 'Favoris d’Applications & Ports Locaux';
-    if (url === 'my://extensions') return 'Extensions Chrome & Paquets CRX';
-    if (url === 'my://agent') return 'Agent DOM, Diagnostic 3D & Pont 127.0.0.1';
-    if (url === 'my://privacy') return 'Bouclier Réseau & Partitions Chromium';
-    if (url === 'my://3d-lab') return 'Banc d’Essai WebGL2 / Shaders Temps Réel';
-    return url;
+    if (url === 'my://start') return 'Nouvel onglet';
+    if (url === 'my://apps') return 'Favoris';
+    if (url === 'my://extensions') return 'Extensions';
+    if (url === 'my://agent') return 'Outils';
+    if (url === 'my://privacy') return 'Confidentialité';
+    if (url === 'my://3d-lab') return 'Rendu 3D';
+    try {
+      const parsed = new URL(url);
+      return parsed.hostname.replace(/^www\./i, '') || url;
+    } catch {
+      return url;
+    }
   }
 
   public navigateTab(rawUrl: string, targetTabId?: string): void {
@@ -890,10 +930,32 @@ class MyBrowserKernel {
     ipcMain.handle(
       'browser:create-tab',
       (_e, payload: { url?: string; workspaceId?: string; inSplit?: boolean }) => {
-        this.createTab(payload?.url || 'my://start', payload?.workspaceId, Boolean(payload?.inSplit));
+        this.createTab(payload?.url, payload?.workspaceId, Boolean(payload?.inSplit));
         return this.getSnapshot();
       }
     );
+
+    ipcMain.handle('browser:set-theme', (_e, theme: ThemeMode) => {
+      if (theme === 'light' || theme === 'dark') {
+        this.theme = theme;
+        this.savePersistedConfig();
+        this.broadcastState();
+      }
+      return this.getSnapshot();
+    });
+
+    ipcMain.handle('browser:set-default-new-tab-url', (_e, rawUrl: string) => {
+      const cleaned = (rawUrl || '').trim();
+      if (!cleaned || cleaned === 'my://start') {
+        this.defaultNewTabUrl = 'my://start';
+      } else {
+        const resolved = this.resolveUrlAndSecurity(cleaned);
+        this.defaultNewTabUrl = resolved.url;
+      }
+      this.savePersistedConfig();
+      this.broadcastState();
+      return this.getSnapshot();
+    });
 
     ipcMain.handle(
       'browser:select-tab',

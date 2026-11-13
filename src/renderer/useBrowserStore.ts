@@ -7,6 +7,7 @@ import {
   ConnectedApp,
   RightSidebarPanel,
   SecurityState,
+  ThemeMode,
   UserScriptRecipe,
   ViewportBoundsPayload,
   Workspace,
@@ -25,6 +26,8 @@ declare global {
     myBrowser?: {
       getState: () => Promise<BrowserStateSnapshot>;
       onStateChange: (cb: (s: BrowserStateSnapshot) => void) => () => void;
+      setTheme: (theme: ThemeMode) => Promise<BrowserStateSnapshot>;
+      setDefaultNewTabUrl: (url: string) => Promise<BrowserStateSnapshot>;
       selectWorkspace: (id: string) => Promise<BrowserStateSnapshot>;
       createWorkspace: (p: { name: string; code: string; description: string }) => Promise<BrowserStateSnapshot>;
       createTab: (url?: string, workspaceId?: string, inSplit?: boolean) => Promise<BrowserStateSnapshot>;
@@ -102,16 +105,29 @@ function detectHardwareGpu() {
 
 function buildInitialState(): BrowserStateSnapshot {
   let savedApps = DEFAULT_CONNECTED_APPS;
+  let savedTheme: ThemeMode = 'dark';
+  let savedDefaultUrl = 'my://start';
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed.connectedApps)) {
-        savedApps = parsed.connectedApps;
+        const isLegacy = parsed.connectedApps.some(
+          (a: ConnectedApp) => a.id === 'app-studio-3d' || a.id === 'app-hub-api'
+        );
+        if (!isLegacy) {
+          savedApps = parsed.connectedApps;
+        }
+      }
+      if (parsed.theme === 'light' || parsed.theme === 'dark') {
+        savedTheme = parsed.theme;
+      }
+      if (typeof parsed.defaultNewTabUrl === 'string' && parsed.defaultNewTabUrl.trim()) {
+        savedDefaultUrl = parsed.defaultNewTabUrl.trim();
       }
     }
   } catch {
-    // Use default apps
+    // Use defaults
   }
 
   const gpu = detectHardwareGpu();
@@ -121,16 +137,18 @@ function buildInitialState(): BrowserStateSnapshot {
     chromiumVersion: '130.0.6723.116',
     electronVersion: '33.2.0',
     nodeVersion: '22.23.3',
+    theme: savedTheme,
+    defaultNewTabUrl: savedDefaultUrl,
     workspaces: DEFAULT_WORKSPACES,
     activeWorkspaceId: 'ws-atelier',
     tabs: DEFAULT_TABS,
     activeTabId: 'tab-start',
-    splitMode: true,
-    secondaryTabId: 'tab-apps',
+    splitMode: false,
+    secondaryTabId: null,
     focusedPane: 'primary',
-    splitRatio: 0.54,
+    splitRatio: 0.5,
     spineCollapsed: false,
-    rightSidebarPanel: 'agent',
+    rightSidebarPanel: 'none',
     companionAppId: savedApps[0]?.id || null,
     companionCustomUrl: null,
     connectedApps: savedApps,
@@ -140,29 +158,23 @@ function buildInitialState(): BrowserStateSnapshot {
       timestamp: '12:35:10',
       tabId: 'tab-start',
       url: 'my://start',
-      title: 'Planche de Pilotage ISO — MyBrowser',
+      title: 'Nouvel onglet',
       summary: {
-        headingsCount: 7,
-        linksCount: savedApps.length + 6,
-        formsCount: 2,
-        canvases3DCount: 1,
+        headingsCount: 3,
+        linksCount: savedApps.length,
+        formsCount: 1,
+        canvases3DCount: 0,
         scriptsCount: DEFAULT_SCRIPTS.length,
       },
       gpuDiagnostics: gpu,
-      headings: [
-        { tag: 'H1', text: 'Planche de Pilotage ISO — MyBrowser' },
-        { tag: 'H2', text: 'Favoris d’Applications & Ports Locaux' },
-        { tag: 'H2', text: 'Banc de Rendu 3D WebGL2 & Télémétrie Réseau' },
-      ],
+      headings: [{ tag: 'H1', text: 'Nouvel onglet' }],
       links: savedApps.map((a) => ({
-        text: `${a.name} (${a.code})`,
+        text: a.name,
         href: computeAppUrl(a),
         isExternal: a.connectionMode === 'url',
       })),
       metaTags: {
-        'browser:engine': 'Chromium 130 (WebContentsView)',
-        'browser:partition': 'persist:workspace-atelier',
-        'browser:bridge': 'http://127.0.0.1:4577/api/status',
+        'browser:engine': 'Chromium 130',
       },
     },
     bridge: {
@@ -171,47 +183,19 @@ function buildInitialState(): BrowserStateSnapshot {
       port: 4577,
       token: 'mb_9f4e2a8c1d70b3e5a6129c04',
       requestsCount: 4,
-      logs: [
-        {
-          id: 'log-1',
-          timestamp: '12:34:50.104',
-          method: 'GET',
-          endpoint: '/api/status',
-          origin: '127.0.0.1:5188',
-          statusCode: 200,
-          summary: 'Sonde d’état Chromium & partition active (ISO-01)',
-        },
-        {
-          id: 'log-2',
-          timestamp: '12:33:12.480',
-          method: 'GET',
-          endpoint: '/api/apps',
-          origin: '127.0.0.1:3000',
-          statusCode: 200,
-          summary: 'Lecture des favoris d’applications externes & ports locaux',
-        },
-        {
-          id: 'log-3',
-          timestamp: '12:31:02.008',
-          method: 'POST',
-          endpoint: '/api/agent/extract',
-          origin: '127.0.0.1 (Agent Kernel)',
-          statusCode: 200,
-          summary: 'Inspection DOM & capacités GPU WebGL2/WebGPU',
-        },
-      ],
+      logs: [],
     },
     extensions: [],
     extensionInstalling: false,
     extensionStatusMessage: null,
     updater: {
-      currentVersion: '0.1.5',
-      latestVersion: '0.1.5',
+      currentVersion: '0.1.6',
+      latestVersion: '0.1.6',
       status: 'up-to-date',
       progressPercent: 0,
       releaseUrl: 'https://github.com/jcf2108/MyBrowser/releases',
       downloadUrl: null,
-      message: 'MyBrowser v0.1.5 est à jour.',
+      message: 'MyBrowser v0.1.6 est à jour.',
     },
   };
 }
@@ -225,17 +209,17 @@ function inferSecurityAndUrl(rawInput: string, apps: ConnectedApp[]): { url: str
       return inferSecurityAndUrl(computeAppUrl(matchedApp), apps);
     }
     const titleMap: Record<string, string> = {
-      'my://start': 'Planche de Pilotage ISO — MyBrowser',
-      'my://apps': 'Favoris d’Applications & Ports Locaux',
-      'my://extensions': 'Extensions Chrome & Paquets CRX',
-      'my://agent': 'Agent DOM, Diagnostic 3D & Pont 127.0.0.1',
-      'my://privacy': 'Bouclier Réseau & Partitions Chromium',
-      'my://3d-lab': 'Banc d’Essai WebGL2 / Shaders Temps Réel',
+      'my://start': 'Nouvel onglet',
+      'my://apps': 'Favoris',
+      'my://extensions': 'Extensions',
+      'my://agent': 'Outils',
+      'my://privacy': 'Confidentialité',
+      'my://3d-lab': 'Rendu 3D',
     };
     return {
       url: trimmed,
       securityState: 'internal',
-      title: titleMap[trimmed] || `Surface Interne (${trimmed})`,
+      title: titleMap[trimmed] || trimmed,
     };
   }
 
@@ -332,14 +316,18 @@ export function useBrowserStore() {
     });
   }, []);
 
-  const createTab = useCallback(async (url = 'my://start', workspaceId?: string, inSplit = false) => {
+  const createTab = useCallback(async (url?: string, workspaceId?: string, inSplit = false) => {
     if (window.myBrowser) {
       setState(await window.myBrowser.createTab(url, workspaceId, inSplit));
       return;
     }
     setState((prev) => {
       const wsId = workspaceId || prev.activeWorkspaceId;
-      const resolved = inferSecurityAndUrl(url, prev.connectedApps);
+      const effectiveUrl =
+        url && url.trim() && url.trim() !== 'default'
+          ? url.trim()
+          : prev.defaultNewTabUrl || 'my://start';
+      const resolved = inferSecurityAndUrl(effectiveUrl, prev.connectedApps);
       const newTab: BrowserTab = {
         id: `tab-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
         workspaceId: wsId,
@@ -926,9 +914,74 @@ export function useBrowserStore() {
     }
   }, []);
 
+  const setTheme = useCallback(async (theme: ThemeMode) => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.setTheme(theme));
+      return;
+    }
+    setState((prev) => {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            connectedApps: prev.connectedApps,
+            theme,
+            defaultNewTabUrl: prev.defaultNewTabUrl,
+          })
+        );
+      } catch {}
+      return { ...prev, theme };
+    });
+  }, []);
+
+  const setDefaultNewTabUrl = useCallback(async (rawUrl: string) => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.setDefaultNewTabUrl(rawUrl));
+      return;
+    }
+    setState((prev) => {
+      const cleaned = (rawUrl || '').trim();
+      const nextUrl =
+        !cleaned || cleaned === 'my://start'
+          ? 'my://start'
+          : inferSecurityAndUrl(cleaned, prev.connectedApps).url;
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            connectedApps: prev.connectedApps,
+            theme: prev.theme,
+            defaultNewTabUrl: nextUrl,
+          })
+        );
+      } catch {}
+      return { ...prev, defaultNewTabUrl: nextUrl };
+    });
+  }, []);
+
+  const goBack = useCallback(async (tabId?: string) => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.goBack(tabId));
+    }
+  }, []);
+
+  const goForward = useCallback(async (tabId?: string) => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.goForward(tabId));
+    }
+  }, []);
+
+  const reload = useCallback(async (tabId?: string) => {
+    if (window.myBrowser) {
+      setState(await window.myBrowser.reload(tabId));
+    }
+  }, []);
+
   return {
     state,
     actions: {
+      setTheme,
+      setDefaultNewTabUrl,
       selectWorkspace,
       createWorkspace,
       createTab,
@@ -936,6 +989,9 @@ export function useBrowserStore() {
       closeTab,
       togglePinTab,
       navigate,
+      goBack,
+      goForward,
+      reload,
       toggleSplitMode,
       setFocusedPane,
       swapSplitPanes,

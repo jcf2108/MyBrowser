@@ -164,11 +164,15 @@ export interface AppUpdateState {
   message: string | null;
 }
 
+export type ThemeMode = 'dark' | 'light';
+
 export interface BrowserStateSnapshot {
   isElectronNative: boolean;
   chromiumVersion: string;
   electronVersion: string;
   nodeVersion: string;
+  theme: ThemeMode;
+  defaultNewTabUrl: string;
   workspaces: Workspace[];
   activeWorkspaceId: string;
   tabs: BrowserTab[];

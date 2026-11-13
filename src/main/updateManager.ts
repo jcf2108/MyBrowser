@@ -152,7 +152,7 @@ export class UpdateManager {
   constructor(onStateChanged: () => void) {
     this.onStateChanged = onStateChanged;
     this.state = {
-      currentVersion: app.getVersion() || '0.1.5',
+      currentVersion: app.getVersion() || '0.1.6',
       latestVersion: null,
       status: 'idle',
       progressPercent: 0,

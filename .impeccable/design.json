@@ -1,378 +1,544 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-05T13:07:00Z",
+  "generatedAt": "2026-11-13T18:57:00Z",
   "title": "Design System: MyBrowser",
   "extensions": {
     "colorMeta": {
-      "rotring-vermilion": {
+      "indigo-accent-dark": {
         "role": "primary",
-        "displayName": "Vermillon Rotring",
-        "canonical": "#ff5a26",
+        "displayName": "Indigo Doux — Mode Sombre",
+        "canonical": "#6366f1",
         "tonalRamp": [
-          "oklch(22% 0.08 35)",
-          "oklch(32% 0.13 35)",
-          "oklch(44% 0.17 35)",
-          "oklch(56% 0.20 35)",
-          "oklch(67% 0.22 35)",
-          "oklch(76% 0.17 35)",
-          "oklch(86% 0.10 35)",
-          "oklch(94% 0.04 35)"
+          "oklch(24% 0.09 277)",
+          "oklch(34% 0.14 277)",
+          "oklch(45% 0.19 277)",
+          "oklch(58% 0.22 277)",
+          "oklch(67% 0.18 277)",
+          "oklch(77% 0.12 277)",
+          "oklch(87% 0.07 277)",
+          "oklch(95% 0.03 277)"
         ]
       },
-      "rotring-vermilion-hover": {
+      "indigo-accent-hover-dark": {
         "role": "primary",
-        "displayName": "Vermillon Rotring Survol",
-        "canonical": "#ff7142",
+        "displayName": "Indigo Lumineux Survol — Mode Sombre",
+        "canonical": "#818cf8",
         "tonalRamp": [
-          "oklch(24% 0.08 37)",
-          "oklch(35% 0.12 37)",
-          "oklch(47% 0.16 37)",
-          "oklch(59% 0.19 37)",
-          "oklch(71% 0.19 37)",
-          "oklch(80% 0.14 37)",
-          "oklch(88% 0.09 37)",
-          "oklch(95% 0.04 37)"
+          "oklch(26% 0.09 277)",
+          "oklch(37% 0.13 277)",
+          "oklch(49% 0.17 277)",
+          "oklch(61% 0.19 277)",
+          "oklch(68% 0.17 277)",
+          "oklch(78% 0.12 277)",
+          "oklch(88% 0.07 277)",
+          "oklch(95% 0.03 277)"
         ]
       },
-      "accent-contrast-ink": {
+      "indigo-accent-soft-dark": {
         "role": "primary",
-        "displayName": "Encre Contraste sur Vermillon",
-        "canonical": "#0d1014",
+        "displayName": "Halo Indigo Translucide — Mode Sombre",
+        "canonical": "rgba(99, 102, 241, 0.15)",
         "tonalRamp": [
-          "oklch(17% 0.01 250)",
-          "oklch(26% 0.01 250)",
-          "oklch(37% 0.01 250)",
-          "oklch(49% 0.01 250)",
-          "oklch(61% 0.01 250)",
-          "oklch(73% 0.01 250)",
-          "oklch(85% 0.01 250)",
-          "oklch(94% 0.005 250)"
+          "oklch(22% 0.05 277)",
+          "oklch(30% 0.07 277)",
+          "oklch(40% 0.09 277)",
+          "oklch(50% 0.10 277)",
+          "oklch(62% 0.09 277)",
+          "oklch(74% 0.07 277)",
+          "oklch(86% 0.04 277)",
+          "oklch(94% 0.02 277)"
         ]
       },
-      "technical-emerald": {
+      "indigo-accent-light": {
+        "role": "primary",
+        "displayName": "Indigo Profond — Mode Clair",
+        "canonical": "#4f46e5",
+        "tonalRamp": [
+          "oklch(22% 0.10 277)",
+          "oklch(32% 0.15 277)",
+          "oklch(43% 0.21 277)",
+          "oklch(51% 0.24 277)",
+          "oklch(62% 0.20 277)",
+          "oklch(74% 0.14 277)",
+          "oklch(86% 0.08 277)",
+          "oklch(95% 0.03 277)"
+        ]
+      },
+      "indigo-accent-hover-light": {
+        "role": "primary",
+        "displayName": "Indigo Pressé Survol — Mode Clair",
+        "canonical": "#4338ca",
+        "tonalRamp": [
+          "oklch(20% 0.10 277)",
+          "oklch(30% 0.15 277)",
+          "oklch(40% 0.21 277)",
+          "oklch(46% 0.23 277)",
+          "oklch(58% 0.20 277)",
+          "oklch(71% 0.14 277)",
+          "oklch(84% 0.08 277)",
+          "oklch(94% 0.03 277)"
+        ]
+      },
+      "indigo-accent-soft-light": {
+        "role": "primary",
+        "displayName": "Halo Indigo Translucide — Mode Clair",
+        "canonical": "rgba(79, 70, 229, 0.10)",
+        "tonalRamp": [
+          "oklch(24% 0.05 277)",
+          "oklch(34% 0.07 277)",
+          "oklch(45% 0.09 277)",
+          "oklch(57% 0.10 277)",
+          "oklch(69% 0.08 277)",
+          "oklch(80% 0.06 277)",
+          "oklch(89% 0.04 277)",
+          "oklch(96% 0.02 277)"
+        ]
+      },
+      "emerald-success-dark": {
         "role": "secondary",
-        "displayName": "Émeraude Technique",
-        "canonical": "#2ea043",
+        "displayName": "Émeraude Calme — Mode Sombre",
+        "canonical": "#10b981",
         "tonalRamp": [
-          "oklch(22% 0.06 148)",
-          "oklch(32% 0.09 148)",
-          "oklch(43% 0.12 148)",
-          "oklch(54% 0.15 148)",
-          "oklch(62% 0.16 148)",
-          "oklch(73% 0.13 148)",
-          "oklch(84% 0.08 148)",
-          "oklch(94% 0.04 148)"
+          "oklch(23% 0.06 162)",
+          "oklch(34% 0.09 162)",
+          "oklch(46% 0.13 162)",
+          "oklch(58% 0.15 162)",
+          "oklch(69% 0.16 162)",
+          "oklch(79% 0.12 162)",
+          "oklch(88% 0.07 162)",
+          "oklch(95% 0.03 162)"
         ]
       },
-      "amber-warning": {
+      "emerald-success-light": {
+        "role": "secondary",
+        "displayName": "Émeraude Calme — Mode Clair",
+        "canonical": "#059669",
+        "tonalRamp": [
+          "oklch(21% 0.06 162)",
+          "oklch(31% 0.09 162)",
+          "oklch(42% 0.12 162)",
+          "oklch(54% 0.14 162)",
+          "oklch(60% 0.15 162)",
+          "oklch(73% 0.12 162)",
+          "oklch(85% 0.07 162)",
+          "oklch(94% 0.03 162)"
+        ]
+      },
+      "coral-danger-dark": {
         "role": "tertiary",
-        "displayName": "Ambre d'Alerte Hors-Ligne",
-        "canonical": "#d29922",
+        "displayName": "Corail de Révocation — Mode Sombre",
+        "canonical": "#ef4444",
         "tonalRamp": [
-          "oklch(24% 0.05 80)",
-          "oklch(35% 0.08 80)",
-          "oklch(47% 0.11 80)",
-          "oklch(59% 0.13 80)",
-          "oklch(70% 0.15 80)",
-          "oklch(80% 0.12 80)",
-          "oklch(89% 0.07 80)",
-          "oklch(95% 0.03 80)"
+          "oklch(23% 0.09 26)",
+          "oklch(34% 0.13 26)",
+          "oklch(46% 0.18 26)",
+          "oklch(58% 0.21 26)",
+          "oklch(63% 0.22 26)",
+          "oklch(75% 0.15 26)",
+          "oklch(86% 0.09 26)",
+          "oklch(94% 0.04 26)"
         ]
       },
-      "crimson-danger": {
+      "coral-danger-light": {
         "role": "tertiary",
-        "displayName": "Rouge Critique de Révocation",
-        "canonical": "#f85149",
+        "displayName": "Corail de Révocation — Mode Clair",
+        "canonical": "#dc2626",
         "tonalRamp": [
-          "oklch(23% 0.08 25)",
-          "oklch(34% 0.12 25)",
-          "oklch(46% 0.16 25)",
-          "oklch(57% 0.19 25)",
-          "oklch(66% 0.21 25)",
-          "oklch(76% 0.15 25)",
-          "oklch(86% 0.09 25)",
-          "oklch(94% 0.04 25)"
+          "oklch(21% 0.09 26)",
+          "oklch(31% 0.13 26)",
+          "oklch(43% 0.18 26)",
+          "oklch(55% 0.22 26)",
+          "oklch(66% 0.18 26)",
+          "oklch(77% 0.13 26)",
+          "oklch(87% 0.08 26)",
+          "oklch(95% 0.03 26)"
         ]
       },
-      "slate-drafting-bg": {
+      "obsidian-shell-dark": {
         "role": "neutral",
-        "displayName": "Ardoise Graphite de Fond",
-        "canonical": "#121519",
+        "displayName": "Coque Périphérique — Sombre",
+        "canonical": "#141418",
         "tonalRamp": [
-          "oklch(19% 0.012 250)",
-          "oklch(24% 0.015 250)",
-          "oklch(31% 0.018 250)",
-          "oklch(40% 0.02 250)",
-          "oklch(52% 0.02 250)",
-          "oklch(66% 0.02 250)",
-          "oklch(80% 0.015 250)",
-          "oklch(93% 0.01 250)"
+          "oklch(19% 0.01 280)",
+          "oklch(25% 0.012 280)",
+          "oklch(33% 0.014 280)",
+          "oklch(43% 0.015 280)",
+          "oklch(55% 0.015 280)",
+          "oklch(68% 0.012 280)",
+          "oklch(82% 0.008 280)",
+          "oklch(94% 0.005 280)"
         ]
       },
-      "atelier-panel": {
+      "obsidian-viewport-dark": {
         "role": "neutral",
-        "displayName": "Panneau d'Atelier ISO",
-        "canonical": "#1a1f26",
+        "displayName": "Toile du Viewport Web — Sombre",
+        "canonical": "#19191f",
         "tonalRamp": [
-          "oklch(19% 0.012 250)",
-          "oklch(24% 0.016 250)",
-          "oklch(31% 0.02 250)",
-          "oklch(41% 0.022 250)",
-          "oklch(53% 0.022 250)",
-          "oklch(67% 0.02 250)",
-          "oklch(81% 0.015 250)",
-          "oklch(93% 0.01 250)"
+          "oklch(21% 0.012 280)",
+          "oklch(28% 0.014 280)",
+          "oklch(36% 0.016 280)",
+          "oklch(46% 0.016 280)",
+          "oklch(58% 0.015 280)",
+          "oklch(70% 0.012 280)",
+          "oklch(83% 0.008 280)",
+          "oklch(94% 0.005 280)"
         ]
       },
-      "elevated-cartouche": {
+      "velvet-surface-dark": {
         "role": "neutral",
-        "displayName": "Cartouche Surélevé",
-        "canonical": "#212730",
+        "displayName": "Surface de Carte & Contrôle — Sombre",
+        "canonical": "#1e1e24",
         "tonalRamp": [
-          "oklch(20% 0.014 250)",
-          "oklch(27% 0.018 250)",
-          "oklch(35% 0.022 250)",
-          "oklch(45% 0.024 250)",
-          "oklch(57% 0.022 250)",
-          "oklch(70% 0.018 250)",
-          "oklch(83% 0.014 250)",
-          "oklch(94% 0.008 250)"
+          "oklch(20% 0.012 280)",
+          "oklch(24% 0.014 280)",
+          "oklch(32% 0.016 280)",
+          "oklch(42% 0.018 280)",
+          "oklch(54% 0.016 280)",
+          "oklch(67% 0.014 280)",
+          "oklch(81% 0.01 280)",
+          "oklch(94% 0.006 280)"
         ]
       },
-      "iso-hairline": {
+      "elevated-surface-dark": {
         "role": "neutral",
-        "displayName": "Filet Continu ISO 1px",
-        "canonical": "#2a313c",
+        "displayName": "Surface Surélevée de Champ — Sombre",
+        "canonical": "#26262e",
         "tonalRamp": [
-          "oklch(21% 0.016 252)",
-          "oklch(31% 0.022 252)",
-          "oklch(40% 0.025 252)",
-          "oklch(50% 0.025 252)",
-          "oklch(61% 0.022 252)",
-          "oklch(73% 0.018 252)",
-          "oklch(84% 0.012 252)",
-          "oklch(94% 0.006 252)"
+          "oklch(21% 0.014 280)",
+          "oklch(27% 0.016 280)",
+          "oklch(35% 0.018 280)",
+          "oklch(45% 0.018 280)",
+          "oklch(57% 0.016 280)",
+          "oklch(70% 0.014 280)",
+          "oklch(83% 0.01 280)",
+          "oklch(94% 0.006 280)"
         ]
       },
-      "iso-line-strong": {
+      "hover-surface-dark": {
         "role": "neutral",
-        "displayName": "Filet Structurel Fort",
-        "canonical": "#384252",
+        "displayName": "Surface de Survol — Sombre",
+        "canonical": "#2a2a34",
         "tonalRamp": [
-          "oklch(23% 0.02 252)",
-          "oklch(34% 0.026 252)",
-          "oklch(38% 0.028 252)",
-          "oklch(49% 0.028 252)",
-          "oklch(60% 0.025 252)",
-          "oklch(72% 0.02 252)",
-          "oklch(84% 0.014 252)",
-          "oklch(94% 0.008 252)"
+          "oklch(22% 0.016 280)",
+          "oklch(29% 0.018 280)",
+          "oklch(38% 0.02 280)",
+          "oklch(48% 0.02 280)",
+          "oklch(60% 0.018 280)",
+          "oklch(72% 0.014 280)",
+          "oklch(84% 0.01 280)",
+          "oklch(95% 0.006 280)"
         ]
       },
-      "chalk-ink": {
+      "hairline-border-dark": {
         "role": "neutral",
-        "displayName": "Encre Blanc Craie",
-        "canonical": "#e6edf3",
+        "displayName": "Filet Translucide — Sombre",
+        "canonical": "rgba(255, 255, 255, 0.08)",
         "tonalRamp": [
-          "oklch(22% 0.012 245)",
-          "oklch(34% 0.012 245)",
-          "oklch(46% 0.012 245)",
-          "oklch(58% 0.012 245)",
-          "oklch(70% 0.012 245)",
-          "oklch(82% 0.012 245)",
-          "oklch(90% 0.01 245)",
-          "oklch(94% 0.009 245)"
+          "oklch(24% 0.01 280)",
+          "oklch(33% 0.01 280)",
+          "oklch(43% 0.01 280)",
+          "oklch(54% 0.01 280)",
+          "oklch(65% 0.01 280)",
+          "oklch(76% 0.01 280)",
+          "oklch(86% 0.005 280)",
+          "oklch(95% 0.005 280)"
         ]
       },
-      "technical-slate-secondary": {
+      "alabaster-text-dark": {
         "role": "neutral",
-        "displayName": "Ardoise Technique Secondaire",
-        "canonical": "#9ba9bb",
+        "displayName": "Encre Principale — Sombre",
+        "canonical": "#f4f4f6",
         "tonalRamp": [
-          "oklch(23% 0.02 248)",
-          "oklch(34% 0.024 248)",
-          "oklch(46% 0.026 248)",
-          "oklch(58% 0.026 248)",
-          "oklch(72% 0.025 248)",
-          "oklch(81% 0.02 248)",
-          "oklch(89% 0.014 248)",
-          "oklch(95% 0.008 248)"
+          "oklch(22% 0.008 280)",
+          "oklch(34% 0.008 280)",
+          "oklch(46% 0.008 280)",
+          "oklch(58% 0.008 280)",
+          "oklch(70% 0.008 280)",
+          "oklch(82% 0.006 280)",
+          "oklch(91% 0.005 280)",
+          "oklch(97% 0.003 280)"
         ]
       },
-      "muted-blueprint-ink": {
+      "muted-slate-dark": {
         "role": "neutral",
-        "displayName": "Encre Fantôme de Saisie",
-        "canonical": "#8c9db0",
+        "displayName": "Encre Secondaire Apaisée — Sombre",
+        "canonical": "#9898a6",
         "tonalRamp": [
-          "oklch(22% 0.02 248)",
-          "oklch(33% 0.024 248)",
-          "oklch(44% 0.026 248)",
-          "oklch(56% 0.028 248)",
-          "oklch(68% 0.026 248)",
-          "oklch(79% 0.02 248)",
-          "oklch(88% 0.014 248)",
-          "oklch(95% 0.008 248)"
+          "oklch(23% 0.016 280)",
+          "oklch(34% 0.018 280)",
+          "oklch(45% 0.02 280)",
+          "oklch(57% 0.02 280)",
+          "oklch(69% 0.02 280)",
+          "oklch(79% 0.015 280)",
+          "oklch(88% 0.01 280)",
+          "oklch(95% 0.005 280)"
+        ]
+      },
+      "pearl-shell-light": {
+        "role": "neutral",
+        "displayName": "Coque Périphérique — Clair",
+        "canonical": "#eef0f5",
+        "tonalRamp": [
+          "oklch(24% 0.014 265)",
+          "oklch(36% 0.014 265)",
+          "oklch(48% 0.014 265)",
+          "oklch(60% 0.014 265)",
+          "oklch(72% 0.012 265)",
+          "oklch(84% 0.01 265)",
+          "oklch(92% 0.008 265)",
+          "oklch(95% 0.007 265)"
+        ]
+      },
+      "daylight-surface-light": {
+        "role": "neutral",
+        "displayName": "Surface & Viewport Blanc Pur — Clair",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(24% 0 0)",
+          "oklch(36% 0 0)",
+          "oklch(48% 0 0)",
+          "oklch(60% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(93% 0 0)",
+          "oklch(100% 0 0)"
+        ]
+      },
+      "alabaster-elevated-light": {
+        "role": "neutral",
+        "displayName": "Surface Surélevée de Champ — Clair",
+        "canonical": "#f7f8fb",
+        "tonalRamp": [
+          "oklch(24% 0.01 265)",
+          "oklch(36% 0.01 265)",
+          "oklch(48% 0.01 265)",
+          "oklch(60% 0.01 265)",
+          "oklch(72% 0.008 265)",
+          "oklch(84% 0.006 265)",
+          "oklch(93% 0.005 265)",
+          "oklch(98% 0.004 265)"
+        ]
+      },
+      "hover-pearl-light": {
+        "role": "neutral",
+        "displayName": "Surface de Survol — Clair",
+        "canonical": "#e3e6ee",
+        "tonalRamp": [
+          "oklch(23% 0.015 265)",
+          "oklch(35% 0.015 265)",
+          "oklch(47% 0.015 265)",
+          "oklch(59% 0.015 265)",
+          "oklch(71% 0.014 265)",
+          "oklch(83% 0.012 265)",
+          "oklch(92% 0.01 265)",
+          "oklch(96% 0.006 265)"
+        ]
+      },
+      "hairline-border-light": {
+        "role": "neutral",
+        "displayName": "Filet Translucide — Clair",
+        "canonical": "rgba(15, 23, 42, 0.09)",
+        "tonalRamp": [
+          "oklch(22% 0.02 260)",
+          "oklch(34% 0.02 260)",
+          "oklch(46% 0.02 260)",
+          "oklch(58% 0.018 260)",
+          "oklch(70% 0.015 260)",
+          "oklch(82% 0.01 260)",
+          "oklch(90% 0.008 260)",
+          "oklch(95% 0.005 260)"
+        ]
+      },
+      "zinc-text-light": {
+        "role": "neutral",
+        "displayName": "Encre Principale — Clair",
+        "canonical": "#18181b",
+        "tonalRamp": [
+          "oklch(21% 0.006 285)",
+          "oklch(31% 0.006 285)",
+          "oklch(42% 0.006 285)",
+          "oklch(54% 0.006 285)",
+          "oklch(66% 0.006 285)",
+          "oklch(78% 0.005 285)",
+          "oklch(88% 0.004 285)",
+          "oklch(95% 0.002 285)"
+        ]
+      },
+      "muted-slate-light": {
+        "role": "neutral",
+        "displayName": "Encre Secondaire Apaisée — Clair",
+        "canonical": "#646775",
+        "tonalRamp": [
+          "oklch(23% 0.02 270)",
+          "oklch(34% 0.022 270)",
+          "oklch(45% 0.024 270)",
+          "oklch(52% 0.024 270)",
+          "oklch(64% 0.02 270)",
+          "oklch(76% 0.015 270)",
+          "oklch(87% 0.01 270)",
+          "oklch(95% 0.005 270)"
         ]
       }
     },
     "typographyMeta": {
       "display": {
-        "displayName": "Display — Titre de Planche ISO",
-        "purpose": "Titre principal en tête des surfaces internes (my://start, my://apps, my://agent, my://privacy, my://3d-lab)."
+        "displayName": "Display — Titre de Vue Interne",
+        "purpose": "Titre court en tête des pages internes (Extensions, Favoris, Confidentialité)."
       },
       "headline": {
-        "displayName": "Headline — En-tête de Cartouche",
-        "purpose": "En-têtes de sections fonctionnelles (Registre des favoris, Passerelle API locale, Bibliothèque Userscripts, Tiroir d'édition)."
+        "displayName": "Headline — En-tête de Modale",
+        "purpose": "En-tête des fenêtres modales (Réglages, Nouveau favori, Modifier le favori) et titre de carte d'ouverture externe."
       },
       "title": {
-        "displayName": "Title — Intitulé d'Onglet & Action",
-        "purpose": "Intitulés d'onglets, noms d'applications connectées et libellés de boutons d'action."
+        "displayName": "Title — Ligne de Réglage & Recherche",
+        "purpose": "Intitulés des lignes de paramètres, noms d'extensions ou de favoris, et champ de recherche principal sur my://start."
       },
       "body": {
-        "displayName": "Body — Description Opératoire",
-        "purpose": "Descriptions opératoires et textes explicatifs limités à 68ch–70ch avec variantes OpenType cv02, cv03, cv04, cv11."
+        "displayName": "Body — Navigation, Onglets & Omnibox",
+        "purpose": "Titres d'onglets dans la barre latérale, barre d'adresse Omnibox, libellés de boutons et champs de saisie secondaires."
       },
       "label": {
-        "displayName": "Label — Télémétrie & Protocole (Azeret Mono)",
-        "purpose": "Codes ISO (ISO-01), préfixes d'Omnibox (SYS // MY://, PORT // LOCAL), ports TCP (:3000, :4577), compteurs tabulaires (BLK:14) et coordonnées 3D."
+        "displayName": "Label — Espaces & Pied de Barre",
+        "purpose": "Sélecteur d'espaces (Perso, Pro, Lab), pastille de version/mise à jour au pied de la barre latérale et monogrammes d'applications."
       }
     },
     "shadows": [
       {
-        "name": "structural-flat",
-        "value": "none",
-        "purpose": "Aucune ombre portée : la hiérarchie repose sur les filets continus de 1px (#2a313c) et l'étagement tonal mat (#121519 → #1a1f26 → #212730)."
+        "name": "shadow-sm",
+        "value": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        "purpose": "Élévation douce du cadre web, de l'Omnibox, de l'onglet actif, des tuiles de favoris et des cartes de surface."
+      },
+      {
+        "name": "shadow-xl",
+        "value": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+        "purpose": "Portance des fenêtres modales centrées (Réglages, Nouveau favori) sur fond assombri."
       }
     ],
     "motion": [
       {
-        "name": "iso-transition",
-        "value": "220ms cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Transition exponentielle d'ouverture/repli de la tranche Spine (240px ↔ 48px) et des cadres Split-View, désactivée sous prefers-reduced-motion."
+        "name": "ui-transition",
+        "value": "200ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Transition fluide universelle des survols, bascules de thème, onglets et ouvertures, désactivée sous prefers-reduced-motion."
       }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "spine-collapse", "value": "860px" },
-      { "name": "lg", "value": "1024px" }
+      { "name": "sm", "value": "640px" }
     ]
   },
   "components": [
     {
-      "name": "Bouton Primaire Rotring (Cadre Focalisé)",
+      "name": "Bouton Primaire Indigo",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Déclencheur principal réservé au panneau ayant le focus actif, en Vermillon Rotring (#ff5a26) à angles droits (0px).",
-      "html": "<button type=\"button\" class=\"ds-btn-primary\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"square\"><path d=\"M12 5v14M5 12h14\"/></svg><span>Ajouter une application (URL / Port)</span></button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: var(--iso-accent, #ff5a26); color: var(--iso-accent-ink, #0d1014); font-family: 'Archivo', system-ui, sans-serif; font-size: 12px; font-weight: 600; line-height: 1.35; border: 1px solid var(--iso-accent, #ff5a26); border-radius: 0px; cursor: pointer; transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background-color: #ff7142; border-color: #ff7142; } .ds-btn-primary:focus-visible { outline: 1px solid var(--iso-accent-ink, #0d1014); outline-offset: -2px; }"
+      "description": "Action principale (Enregistrer, Définir, Aller, Ajouter) en Indigo doux avec coins arrondis de 12px.",
+      "html": "<button type=\"button\" class=\"ds-btn-primary\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg><span>Ajouter</span></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 12px; background-color: var(--ui-accent, #6366f1); color: #ffffff; font-family: 'Archivo', system-ui, sans-serif; font-size: 12px; font-weight: 500; border: none; cursor: pointer; transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background-color: var(--ui-accent-hover, #818cf8); } .ds-btn-primary:focus-visible { outline: 2px solid var(--ui-accent, #6366f1); outline-offset: 1px; }"
     },
     {
-      "name": "Bouton Technique Surélevé (Cartouche Fort)",
+      "name": "Bouton Surface (+ Nouvel onglet)",
       "kind": "button",
-      "refersTo": "button-elevated",
-      "description": "Action secondaire renforcée (+ Onglet, + App, Extraire, Bloquer) sur fond #212730 et bordure #384252.",
-      "html": "<button type=\"button\" class=\"ds-btn-elevated\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\"><path d=\"M12 5v14M5 12h14\"/></svg><span>Onglet</span></button>",
-      "css": ".ds-btn-elevated { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background-color: var(--iso-elevated, #212730); color: var(--iso-ink, #e6edf3); font-family: 'Archivo', system-ui, sans-serif; font-size: 12px; font-weight: 600; border: 1px solid var(--iso-line-strong, #384252); border-radius: 0px; cursor: pointer; transition: border-color 220ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-elevated:hover { border-color: var(--iso-accent, #ff5a26); } .ds-btn-elevated:focus-visible { outline: 1px solid var(--iso-accent, #ff5a26); outline-offset: -1px; }"
+      "refersTo": "button-surface",
+      "description": "Déclencheur doux de barre latérale et d'action secondaire sur fond --ui-surface et filet translucide.",
+      "html": "<button type=\"button\" class=\"ds-btn-surface\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--ui-accent, #6366f1)\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg><span>Nouvel onglet</span></button>",
+      "css": ".ds-btn-surface { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 12px; background-color: var(--ui-surface, #1e1e24); color: var(--ui-text, #f4f4f6); font-family: 'Archivo', system-ui, sans-serif; font-size: 12px; font-weight: 500; border: 1px solid var(--ui-border, rgba(255,255,255,0.08)); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); cursor: pointer; transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-surface:hover { background-color: var(--ui-hover, #2a2a34); } .ds-btn-surface:focus-visible { outline: 2px solid var(--ui-accent, #6366f1); outline-offset: 1px; }"
     },
     {
-      "name": "Bouton Cartouche Fantôme (Action de Ligne)",
+      "name": "Bouton d'Icône de Barre Supérieure",
       "kind": "button",
-      "refersTo": "button-ghost",
-      "description": "Bouton d'instrumentation standard (Onglet, Split, Sidebar, Sonder) sur fond #121519 et filet 1px #2a313c.",
-      "html": "<button type=\"button\" class=\"ds-btn-ghost\">Split-View</button>",
-      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background-color: var(--iso-bg, #121519); color: var(--iso-ink, #e6edf3); font-family: 'Archivo', system-ui, sans-serif; font-size: 12px; font-weight: 400; border: 1px solid var(--iso-line, #2a313c); border-radius: 0px; cursor: pointer; transition: border-color 220ms cubic-bezier(0.16, 1, 0.3, 1), color 220ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-ghost:hover { border-color: var(--iso-accent, #ff5a26); color: var(--iso-ink, #e6edf3); } .ds-btn-ghost:focus-visible { outline: 1px solid var(--iso-accent, #ff5a26); outline-offset: -1px; }"
+      "refersTo": "button-icon-ghost",
+      "description": "Contrôle carré 32×32px (rounded-lg) pour la navigation, le repli de la barre latérale, le thème Clair/Sombre et les réglages.",
+      "html": "<button type=\"button\" class=\"ds-btn-icon\" title=\"Mode clair / sombre\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41\"/></svg></button>",
+      "css": ".ds-btn-icon { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: var(--ui-muted, #9898a6); border: none; cursor: pointer; transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-icon:hover { background-color: var(--ui-hover, #2a2a34); color: var(--ui-text, #f4f4f6); } .ds-btn-icon:focus-visible { outline: 2px solid var(--ui-accent, #6366f1); outline-offset: 1px; }"
     },
     {
-      "name": "Omnibox ISO de Protocole & Port",
+      "name": "Barre d'Adresse Omnibox Arrondie",
       "kind": "input",
       "refersTo": "input-omnibox",
-      "description": "Barre d'adresse et de commande 28px combinant préfixe de protocole en Azeret Mono, saisie URL/port et déclencheur + App.",
-      "html": "<div class=\"ds-omnibox\"><span class=\"ds-omnibox-prefix\">SYS // MY://</span><input type=\"text\" class=\"ds-omnibox-input\" value=\"my://start\" aria-label=\"Omnibox\" /><button type=\"button\" class=\"ds-omnibox-btn\">+ App</button></div>",
-      "css": ".ds-omnibox { display: flex; align-items: center; height: 28px; background-color: var(--iso-bg, #121519); border: 1px solid var(--iso-line, #2a313c); border-radius: 0px; max-width: 520px; } .ds-omnibox:focus-within { border-color: var(--iso-accent, #ff5a26); } .ds-omnibox-prefix { display: inline-flex; align-items: center; height: 100%; padding: 0 8px; border-right: 1px solid var(--iso-line, #2a313c); font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--iso-ink-secondary, #9ba9bb); white-space: nowrap; } .ds-omnibox-input { flex: 1; min-width: 0; height: 100%; padding: 0 8px; background: transparent; border: none; color: var(--iso-ink, #e6edf3); font-family: 'Azeret Mono', monospace; font-size: 12px; caret-color: var(--iso-accent, #ff5a26); } .ds-omnibox-input:focus { outline: none; } .ds-omnibox-btn { height: 100%; padding: 0 8px; background: transparent; border: none; border-left: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink-secondary, #9ba9bb); font-family: 'Archivo', sans-serif; font-size: 12px; cursor: pointer; } .ds-omnibox-btn:hover { color: var(--iso-ink, #e6edf3); }"
+      "description": "Champ d'adresse central de 32px (rounded-xl) avec icône de sécurité discrète et bordure indigo au focus.",
+      "html": "<div class=\"ds-omnibox\"><svg class=\"ds-omnibox-icon\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"18\" height=\"11\" x=\"3\" y=\"11\" rx=\"2\" ry=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/></svg><input type=\"text\" class=\"ds-omnibox-field\" placeholder=\"Rechercher ou saisir une adresse…\" value=\"https://myspot.app\" aria-label=\"Barre d'adresse\" /></div>",
+      "css": ".ds-omnibox { display: flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 12px; background-color: var(--ui-surface, #1e1e24); border: 1px solid var(--ui-border, rgba(255,255,255,0.08)); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); max-width: 480px; transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-omnibox:focus-within { border-color: var(--ui-accent, #6366f1); } .ds-omnibox-icon { color: var(--ui-muted, #9898a6); margin-right: 8px; flex-shrink: 0; } .ds-omnibox-field { width: 100%; background: transparent; border: none; color: var(--ui-text, #f4f4f6); font-family: 'Archivo', system-ui, sans-serif; font-size: 12px; caret-color: var(--ui-accent, #6366f1); } .ds-omnibox-field:focus { outline: none; }"
     },
     {
-      "name": "Timbres de Focus & Télémétrie Réseau",
-      "kind": "chip",
-      "description": "Badges orthogonaux en Azeret Mono signalant le cadre focalisé (CADRE A // FOCUS), le cadre secondaire ([B]) et le compteur Adblock tabulaire.",
-      "html": "<div class=\"ds-chips-row\"><span class=\"ds-chip-focus\">CADRE A // FOCUS</span><span class=\"ds-chip-secondary\">[B]</span><span class=\"ds-chip-shield\"><span class=\"ds-dot-emerald\"></span>BLK:14</span></div>",
-      "css": ".ds-chips-row { display: inline-flex; align-items: center; gap: 8px; font-family: 'Azeret Mono', monospace; font-variant-numeric: tabular-nums; } .ds-chip-focus { padding: 2px 6px; background-color: var(--iso-accent, #ff5a26); color: var(--iso-accent-ink, #0d1014); font-size: 10px; font-weight: 700; } .ds-chip-secondary { padding: 2px 6px; background-color: var(--iso-signal, #2ea043); color: var(--iso-accent-ink, #0d1014); font-size: 10px; font-weight: 700; } .ds-chip-shield { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px; background-color: var(--iso-bg, #121519); border: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink, #e6edf3); font-size: 11px; } .ds-dot-emerald { width: 6px; height: 6px; background-color: var(--iso-signal, #2ea043); display: inline-block; }"
-    },
-    {
-      "name": "Cartouche d'En-tête Split-View (Ligne de Base 36px)",
+      "name": "Sélecteur d'Espaces & Onglet Vertical Arc / Zen",
       "kind": "nav",
-      "description": "Barre d'en-tête de 36px alignée au pixel près entre le Cadre A et le Cadre B, soulignée de vermillon sur la vue active.",
-      "html": "<div class=\"ds-pane-header\"><div class=\"ds-pane-left\"><span class=\"ds-pane-stamp\">CADRE A // FOCUS</span><span class=\"ds-pane-title\">Planche de Pilotage ISO</span></div><div class=\"ds-pane-right\"><span class=\"ds-pane-url\">my://start</span><button type=\"button\" class=\"ds-pane-btn\">my://start</button></div></div>",
-      "css": ".ds-pane-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 36px; padding: 0 12px; background-color: var(--iso-panel, #1a1f26); border-bottom: 1px solid var(--iso-accent, #ff5a26); color: var(--iso-ink, #e6edf3); } .ds-pane-left { display: flex; align-items: center; gap: 8px; min-width: 0; } .ds-pane-stamp { padding: 2px 6px; background-color: var(--iso-accent, #ff5a26); color: var(--iso-accent-ink, #0d1014); font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 700; } .ds-pane-title { font-family: 'Archivo', sans-serif; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-pane-right { display: flex; align-items: center; gap: 8px; font-family: 'Azeret Mono', monospace; font-size: 11px; } .ds-pane-url { color: var(--iso-ink-secondary, #9ba9bb); } .ds-pane-btn { padding: 2px 6px; background-color: var(--iso-bg, #121519); border: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink, #e6edf3); font-family: 'Azeret Mono', monospace; font-size: 10px; cursor: pointer; } .ds-pane-btn:hover { border-color: var(--iso-accent, #ff5a26); }"
+      "description": "Commutateur segmenté à 3 espaces et ligne d'onglet vertical de 36px (rounded-xl) avec fermeture discrète au survol.",
+      "html": "<div class=\"ds-sidebar-sample\"><div class=\"ds-ws-grid\"><button type=\"button\" class=\"ds-ws-btn ds-ws-active\">Perso</button><button type=\"button\" class=\"ds-ws-btn\">Pro</button><button type=\"button\" class=\"ds-ws-btn\">Lab</button></div><div class=\"ds-tab-item\"><div class=\"ds-tab-label\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z\"/></svg><span>MySpot</span></div><button type=\"button\" class=\"ds-tab-close\" title=\"Fermer\">×</button></div></div>",
+      "css": ".ds-sidebar-sample { width: 212px; display: flex; flex-direction: column; gap: 10px; font-family: 'Archivo', system-ui, sans-serif; } .ds-ws-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background-color: var(--ui-surface, #1e1e24); border: 1px solid var(--ui-border, rgba(255,255,255,0.08)); } .ds-ws-btn { height: 28px; border-radius: 8px; border: none; background: transparent; color: var(--ui-muted, #9898a6); font-size: 11px; font-weight: 500; cursor: pointer; transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-ws-active { background-color: var(--ui-accent, #6366f1); color: #ffffff; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); } .ds-tab-item { height: 36px; padding: 0 10px; border-radius: 12px; background-color: var(--ui-surface, #1e1e24); border: 1px solid var(--ui-border, rgba(255,255,255,0.08)); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; color: var(--ui-text, #f4f4f6); font-size: 12px; font-weight: 500; } .ds-tab-label { display: flex; align-items: center; gap: 8px; color: var(--ui-text, #f4f4f6); } .ds-tab-label svg { color: var(--ui-muted, #9898a6); } .ds-tab-close { width: 20px; height: 20px; border-radius: 6px; border: none; background: transparent; color: var(--ui-muted, #9898a6); cursor: pointer; } .ds-tab-close:hover { background-color: var(--ui-hover, #2a2a34); color: var(--ui-text, #f4f4f6); }"
     },
     {
-      "name": "Cartouche de Favori d'Application & Port Configurable",
+      "name": "Pilules d'État Confidentialité & Extension",
+      "kind": "chip",
+      "description": "Pilules arrondies (rounded-full) d'activation du bouclier et badge compact d'extension Chrome.",
+      "html": "<div class=\"ds-chip-group\"><button type=\"button\" class=\"ds-pill-active\">Actif</button><span class=\"ds-pill-counter\">14 bloqués</span><button type=\"button\" class=\"ds-ext-badge\"><span class=\"ds-ext-dot\"></span><span>BIT</span></button></div>",
+      "css": ".ds-chip-group { display: inline-flex; align-items: center; gap: 8px; font-family: 'Archivo', system-ui, sans-serif; } .ds-pill-active { height: 28px; padding: 0 12px; border-radius: 9999px; background-color: var(--ui-accent, #6366f1); color: #ffffff; font-size: 12px; font-weight: 500; border: none; cursor: pointer; } .ds-pill-counter { padding: 4px 10px; border-radius: 9999px; background-color: var(--ui-surface, #1e1e24); border: 1px solid var(--ui-border, rgba(255,255,255,0.08)); color: var(--ui-muted, #9898a6); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; } .ds-ext-badge { height: 28px; padding: 0 8px; border-radius: 8px; background-color: var(--ui-surface, #1e1e24); border: 1px solid var(--ui-border, rgba(255,255,255,0.08)); color: var(--ui-text, #f4f4f6); font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; } .ds-ext-dot { width: 6px; height: 6px; border-radius: 9999px; background-color: var(--ui-accent, #6366f1); }"
+    },
+    {
+      "name": "Carte URL d'Ouverture par Défaut (Nouvel Onglet)",
       "kind": "card",
-      "refersTo": "card-cartouche",
-      "description": "Ligne du registre des applications connectées avec code ISO entre crochets, télémétrie de port 127.0.0.1 modifiable en direct et cibles de lancement.",
-      "html": "<div class=\"ds-app-card\"><div class=\"ds-app-top\"><div class=\"ds-app-id\"><span class=\"ds-app-code\">[3DS]</span><span class=\"ds-app-name\">Studio 3D Local</span><span class=\"ds-app-alias\">· my://3d</span></div><span class=\"ds-app-status\"><span class=\"ds-status-dot\"></span>ACTIF (2ms)</span></div><div class=\"ds-app-bottom\"><div class=\"ds-app-port\"><span>127.0.0.1:</span><input type=\"number\" class=\"ds-port-input\" value=\"3000\" aria-label=\"Port\" /><span>/</span></div><div class=\"ds-app-actions\"><button type=\"button\" class=\"ds-act-btn\">Onglet</button><button type=\"button\" class=\"ds-act-btn\">Split</button><button type=\"button\" class=\"ds-act-btn\">Sidebar</button></div></div></div>",
-      "css": ".ds-app-card { display: flex; flex-direction: column; gap: 8px; padding: 10px; background-color: var(--iso-panel, #1a1f26); border: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink, #e6edf3); } .ds-app-top, .ds-app-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; } .ds-app-id { display: flex; align-items: center; gap: 6px; } .ds-app-code { font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 700; } .ds-app-name { font-family: 'Archivo', sans-serif; font-size: 12px; font-weight: 600; } .ds-app-alias { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--iso-ink-secondary, #9ba9bb); } .ds-app-status { display: inline-flex; align-items: center; gap: 4px; font-family: 'Azeret Mono', monospace; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--iso-signal, #2ea043); } .ds-status-dot { width: 6px; height: 6px; background-color: var(--iso-signal, #2ea043); } .ds-app-port { display: inline-flex; align-items: center; gap: 4px; font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--iso-ink-secondary, #9ba9bb); } .ds-port-input { width: 68px; padding: 2px 6px; background-color: var(--iso-bg, #121519); border: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink, #e6edf3); font-family: 'Azeret Mono', monospace; font-size: 11px; font-variant-numeric: tabular-nums; } .ds-port-input:focus-visible { outline: 1px solid var(--iso-accent, #ff5a26); outline-offset: -1px; } .ds-app-actions { display: flex; gap: 4px; } .ds-act-btn { padding: 2px 8px; background-color: var(--iso-bg, #121519); border: 1px solid var(--iso-line, #2a313c); color: var(--iso-ink, #e6edf3); font-family: 'Archivo', sans-serif; font-size: 12px; cursor: pointer; } .ds-act-btn:hover { border-color: var(--iso-accent, #ff5a26); }"
+      "refersTo": "card-surface",
+      "description": "Carte rounded-2xl permettant de configurer en un clic l'application web ouverte à chaque nouvel onglet (ex. MySpot).",
+      "html": "<div class=\"ds-url-card\"><div class=\"ds-url-header\"><span>URL d’ouverture par défaut (Nouvel onglet)</span></div><div class=\"ds-url-row\"><input type=\"text\" class=\"ds-url-input\" value=\"https://myspot.app\" aria-label=\"URL par défaut\" /><button type=\"button\" class=\"ds-url-save\">Définir</button></div></div>",
+      "css": ".ds-url-card { padding: 14px; border-radius: 16px; background-color: var(--ui-surface, #1e1e24); border: 1px solid var(--ui-border, rgba(255,255,255,0.08)); box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; font-family: 'Archivo', system-ui, sans-serif; max-width: 460px; } .ds-url-header { font-size: 12px; font-weight: 500; color: var(--ui-muted, #9898a6); } .ds-url-row { display: flex; align-items: center; gap: 8px; } .ds-url-input { flex: 1; height: 36px; padding: 0 12px; border-radius: 12px; background-color: var(--ui-elevated, #26262e); border: 1px solid var(--ui-border, rgba(255,255,255,0.08)); color: var(--ui-text, #f4f4f6); font-size: 12px; } .ds-url-input:focus { outline: none; border-color: var(--ui-accent, #6366f1); } .ds-url-save { height: 36px; padding: 0 14px; border-radius: 12px; background-color: var(--ui-accent, #6366f1); color: #ffffff; font-size: 12px; font-weight: 500; border: none; cursor: pointer; } .ds-url-save:hover { background-color: var(--ui-accent-hover, #818cf8); }"
     }
   ],
   "narrative": {
-    "northStar": "Cartouche d'Atelier ISO",
-    "overview": "MyBrowser est conçu comme une table à dessin d'ingénierie ISO et un banc de pilotage Chromium où chaque vue web, chaque partition de session isolée et chaque port local (`127.0.0.1:port`) est encadré par un cartouche technique continu de `1px`. L'interface s'efface au profit des scènes WebGL2/WebGPU et des applications en développement grâce à une densité d'instrument de précision, sans jamais imposer d'applications tierces préconfigurées en dur.\n\nLe système rejette explicitement le flou glassmorphique décoratif (`backdrop-filter`), les ombres portées diffuses, les rayons d'arrondi mous et les barres d'outils bureautiques grises génériques. Toute la hiérarchie repose sur des aplats mats neutres, une grille de filets continus orthogonaux et une signalétique Rotring où la couleur possède une signification opératoire stricte.",
+    "northStar": "Le Cadre Apaisé Arc & Zen",
+    "overview": "MyBrowser adopte l'architecture minimaliste, douce et silencieuse des navigateurs contemporains **Arc Browser** et **Zen Browser**. Plus de 95 % de la fenêtre appartient à la page web ou à l'application favorite de l'utilisateur (telle que `MySpot`), logée dans un cadre périphérique aux coins subtilement arrondis (`12px` / `rounded-xl`) qui détache délicatement le contenu de la coque du navigateur.\n\nLe système bannit toute surcharge textuelle, tout jargon technique d'ingénierie, les bordures carrées agressives et les panneaux latéraux imposés d'office. Chaque contrôle se limite à une icône limpide ou à un libellé de 1 à 3 mots. Une bascule instantanée entre le **Mode Sombre** (anthracite velouté `#141418`) et le **Mode Clair** (perle lumineux `#eef0f5`) adapte l'ensemble des surfaces via des variables CSS sémantiques (`--ui-*`) pilotées par l'attribut `data-theme` sur `<html>`.",
     "keyCharacteristics": [
-      "Cartouches techniques continus de 1px (#2a313c) à géométrie strictement orthogonale (0px de rayon).",
-      "Palette ardoise graphite neutre (#121519 et #1a1f26) calibrée pour préserver la colorimétrie des rendus 3D WebGL2/WebGPU.",
-      "Signalétique d'instrument : Vermillon Rotring (#ff5a26) réservé au focus actif et Émeraude Technique (#2ea043) dédiée aux ports 127.0.0.1 en ligne et au bouclier réseau.",
-      "Colonne verticale repliable en tranche technique (« Spine » de 48px) et double cadre Split-View (CADRE A / CADRE B) aligné au pixel près sur une ligne de base de 36px.",
-      "Télémétrie tabulaire (Azeret Mono, tabular-nums) pour les ports TCP, latences, compteurs Adblock et coordonnées 3D."
+      "Architecture Arc / Zen à cadre périphérique de 6px (px-1.5 pb-1.5) entourant une vue web arrondie (12px / rounded-xl).",
+      "Double palette native Sombre (data-theme=\"dark\") et Clair (data-theme=\"light\") commutable en un clic depuis la barre supérieure ou les réglages.",
+      "Barre latérale gauche escamotable de 224px (w-56) regroupant le sélecteur d'espaces, la grille de favoris rapides, le bouton + Nouvel onglet et la liste verticale épurée des onglets.",
+      "Sobriété textuelle stricte : zéro paragraphe explicatif, zéro jargon protocole ou télémétrie intrusive, libellés courts (1 à 3 mots) et URL d'ouverture par défaut personnalisable.",
+      "Un unique accent Indigo Doux (#6366f1 en sombre, #4f46e5 en clair) réservé aux actions primaires, à l'espace actif et au focus clavier."
     ],
     "rules": [
       {
-        "name": "The Rotring Focus Rule",
-        "body": "Le Vermillon Rotring (#ff5a26) signale un unique foyer d'attention actif à la fois : lorsque le CADRE B prend le focus en Split-View, le CADRE A perd son badge et son filet vermillon au profit d'un cartouche neutre (#2a313c).",
+        "name": "The Dual-Theme Parity Rule",
+        "body": "Chaque composant utilise exclusivement les variables sémantiques ui-* (var(--ui-shell), var(--ui-surface), var(--ui-border), var(--ui-text), var(--ui-muted), var(--ui-accent)). Aucune couleur neutre en dur ne doit briser la bascule instantanée entre data-theme=\"dark\" et data-theme=\"light\".",
         "section": "colors"
       },
       {
-        "name": "The Colorimetric Neutrality Rule",
-        "body": "Les barres et panneaux périphériques restent strictement sur les trois gris ardoise (#121519, #1a1f26, #212730) sans dégradé coloré ni halo lumineux, afin de ne jamais altérer la perception des couleurs dans les scènes WebGL2/WebGPU.",
+        "name": "The Single Quiet Accent Rule",
+        "body": "L'Indigo (#6366f1 / #4f46e5) est le seul accent chromatique de l'interface. Il est réservé aux boutons d'action primaires, au commutateur d'espace actif, à l'indicateur d'outil ouvert et à la bordure du cadre actif en mode Split-View.",
         "section": "colors"
       },
       {
-        "name": "The Localhost Emerald Rule",
-        "body": "L'Émeraude Technique (#2ea043) ne sert jamais d'accent générique de marque ; elle atteste uniquement qu'un service local répond sur 127.0.0.1, que le filtrage réseau est actif ou que le pipeline matériel GPU est opérationnel.",
+        "name": "The Translucent Border Rule",
+        "body": "Les séparations de surfaces utilisent uniquement --ui-border (8 % de blanc en mode Sombre, 9 % d'ardoise en mode Clair) afin que le cadre s'efface visuellement devant le contenu web.",
         "section": "colors"
       },
       {
-        "name": "The Tabular Telemetry Rule",
-        "body": "Tout compteur, numéro de port, temps de latence (2ms), horodatage ou angle en radians doit être composé en Azeret Mono avec font-variant-numeric: tabular-nums (.tabular-nums) pour interdire tout décalage horizontal lors des rafraîchissements.",
+        "name": "The Zero-Bloat Copy Rule",
+        "body": "Les écrans n'affichent jamais de paragraphes d'explication ni de sous-titres descriptifs redondants. Les boutons et contrôles se limitent à 1 à 3 mots (Nouvel onglet, Aller, Définir, Favori, Clair, Sombre).",
         "section": "typography"
       },
       {
-        "name": "The Bracketed Code Rule",
-        "body": "Les identifiants courts d'applications, de cadres et de scripts sont encadrés de crochets droits en Azeret Mono gras ([A], [B], [3DS], [USR-01]) afin de structurer le balayage visuel sans recourir à des favicons disparates.",
+        "name": "The Natural Case Rule",
+        "body": "Toute la signalétique et la navigation s'écrivent en casse naturelle de phrase (« Nouvel onglet », « Confidentialité », « Adresse Web (URL) ») ; les intitulés tout en capitales et les préfixes techniques codés sont proscrits.",
         "section": "typography"
       },
       {
-        "name": "The Structural Hairline Rule",
-        "body": "Toute séparation de zone, de cellule tabulaire ou de composant s'effectue par un filet franc de 1px solid #2a313c (ou gap-px sur fond #2a313c). Les ombres décoratives et le glassmorphisme sont proscrits.",
+        "name": "The Framed Viewport Rule",
+        "body": "Le contenu web ne touche jamais les bords extérieurs de la fenêtre : il est toujours logé dans un conteneur rounded-xl (12px) séparé des bords par 6px de coque --ui-shell et ceint d'un filet --ui-border avec shadow-sm.",
         "section": "elevation"
       },
       {
-        "name": "The Dimmed Context Rule",
-        "body": "Lorsqu'un tiroir de configuration ou une création d'espace est actif, le rail et l'aire centrale abaissent leur opacité (opacity-60 / opacity-65) et la passerelle Electron signale overlayActive: true aux WebContentsView natives.",
+        "name": "The Overlay Sync Rule",
+        "body": "Dès qu'une fenêtre modale (Réglages ou Favori) est ouverte, overlayActive passe à true auprès du processus principal Electron afin que les WebContentsView natives cèdent proprement le premier plan aux dialogues React.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do encadrer chaque zone, barre, cellule de télémétrie et carte par un filet continu de 1px solid #2a313c avec un rayon d'arrondi de 0px.",
-      "Do réserver le Vermillon Rotring (#ff5a26) au seul cadre détenant le focus actif (CADRE A ou CADRE B), à l'espace de travail sélectionné et au déclencheur primaire du panneau focalisé.",
-      "Do appliquer Azeret Mono avec tabular-nums sur tous les numéros de ports TCP (:3000, :4577), compteurs de blocage (BLK:14), latences et valeurs angulaires.",
-      "Do maintenir l'alignement horizontal strict des cartouches d'en-tête de 36px (h-9) entre le CADRE A, le CADRE B et le panneau latéral droit.",
-      "Do limiter les formulaires internes à un maximum de 2 colonnes (sm:grid-cols-2) afin que chaque champ reste intégralement lisible en mode Split-View (340px–456px de large)."
+      "Do utiliser systématiquement les jetons sémantiques ui-* (bg-ui-shell, bg-ui-surface, bg-ui-elevated, border-ui-border, text-ui-text, text-ui-muted, bg-ui-accent) pour préserver l'intégrité des thèmes Clair et Sombre.",
+      "Do maintenir le cadre périphérique de 6px (px-1.5 pb-1.5 gap-1.5) et le rayon rounded-xl (12px) autour du viewport web afin de conserver la signature visuelle Arc / Zen.",
+      "Do rédiger tous les libellés d'interface en français ultra-concis (1 à 3 mots maximum par bouton ou contrôle) sans paragraphe explicatif.",
+      "Do laisser le navigateur s'ouvrir en vue simple par défaut (95 % de la surface dédiée au web), le mode Split-View et les modales n'apparaissant qu'à la demande explicite de l'utilisateur."
     ],
     "donts": [
-      "Don't introduire de flou glassmorphique (backdrop-filter), de dégradés atmosphériques ou de teintes colorées dans les panneaux #121519 / #1a1f26 qui fausseraient la colorimétrie des vues 3D.",
-      "Don't appliquer d'arrondis (border-radius > 0) sur les boutons, onglets, badges ou champs de saisie.",
-      "Don't utiliser l'Émeraude Technique (#2ea043) comme couleur décorative en dehors des états réseau actifs (127.0.0.1 en ligne, bouclier Adblock actif, pipeline WebGL2/WebGPU prêt).",
-      "Don't imposer d'applications tierces verrouillées en dur : la liste des applications connectées doit toujours pouvoir être modifiée ou vidée en un clic (Profil vierge)."
+      "Don't réintroduire d'angles droits (0px), de bordures opaques criardes, de règles graduées ou de jargon technique d'atelier dans l'interface.",
+      "Don't surcharger les écrans internes ou les modales avec des sous-titres descriptifs, des blocs d'aide ou des compteurs de télémétrie permanente dans la barre supérieure.",
+      "Don't utiliser les anciens alias iso-* ou le composant orphelin IsoCadCanvas.tsx sur de nouvelles surfaces.",
+      "Don't imposer d'application tierce verrouillée : l'URL de nouvel onglet et les favoris restent toujours librement personnalisables ou réinitialisables par l'utilisateur."
     ]
   }
 }
