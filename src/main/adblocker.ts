@@ -16,6 +16,40 @@ const TRACKING_PARAMS = new Set([
   '_hsmi',
 ]);
 
+function isExtensionRequestDetails(details: {
+  url: string;
+  referrer?: string;
+  webContents?: { getURL?: () => string };
+  frame?: { url?: string } | null;
+  requestHeaders?: Record<string, string>;
+}): boolean {
+  if (details.url.startsWith('chrome-extension://')) return true;
+  if (details.referrer && details.referrer.startsWith('chrome-extension://')) return true;
+  try {
+    if (details.frame?.url?.startsWith('chrome-extension://')) return true;
+  } catch {
+    // Frame may be destroyed
+  }
+  try {
+    const wcUrl = details.webContents?.getURL?.();
+    if (wcUrl && wcUrl.startsWith('chrome-extension://')) return true;
+  } catch {
+    // WebContents may be destroyed
+  }
+  if (details.requestHeaders) {
+    for (const [k, v] of Object.entries(details.requestHeaders)) {
+      if (
+        k.toLowerCase() === 'origin' &&
+        typeof v === 'string' &&
+        v.startsWith('chrome-extension://')
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 export class NetworkShieldEngine {
   private state: AdblockState;
   private attachedPartitions = new Set<string>();
@@ -73,9 +107,9 @@ export class NetworkShieldEngine {
         const host = parsed.hostname.toLowerCase();
 
         if (
+          isExtensionRequestDetails(details) ||
           parsed.protocol === 'my:' ||
           parsed.protocol === 'devtools:' ||
-          parsed.protocol === 'chrome-extension:' ||
           this.state.allowlistedDomains.some((allowed) => host === allowed || host.endsWith(`.${allowed}`))
         ) {
           this.state.totalAllowed += 1;
@@ -128,18 +162,26 @@ export class NetworkShieldEngine {
     });
 
     ses.webRequest.onBeforeSendHeaders((details, callback) => {
-      const requestHeaders = { ...details.requestHeaders };
+      let protocol = '';
       let host = '';
       let pathname = '';
       let search = '';
       try {
         const parsed = new URL(details.url);
+        protocol = parsed.protocol;
         host = parsed.hostname.toLowerCase();
         pathname = parsed.pathname;
         search = parsed.search;
       } catch {
         // Ignore URL parse error
       }
+
+      // Leave Chrome extension internal & API traffic (e.g. Bitwarden self-hosted vault requests) 100% untouched
+      if (protocol === 'chrome-extension:' || isExtensionRequestDetails(details)) {
+        return callback({});
+      }
+
+      const requestHeaders = { ...details.requestHeaders };
 
       // Only use Firefox desktop identity on interactive Google sign-in pages (/v3/signin, /signin, etc.),
       // NEVER on passive SSO sync endpoints (/CheckCookie, /SetSID, /RotateCookiesPage, /ListAccounts, passive=true)
@@ -152,18 +194,19 @@ export class NetworkShieldEngine {
         !/[?&]passive=true\b/i.test(search);
 
       if (isInteractiveGoogleSignIn) {
-        requestHeaders['User-Agent'] =
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0';
         for (const key of Object.keys(requestHeaders)) {
           const lower = key.toLowerCase();
-          if (lower.startsWith('sec-ch-ua') || lower === 'x-client-data') {
+          if (lower.startsWith('sec-ch-ua') || lower === 'x-client-data' || lower === 'user-agent') {
             delete requestHeaders[key];
           }
         }
+        requestHeaders['User-Agent'] =
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0';
       } else {
         // Consistent modern Chrome 141 identity + Client Hints across Google Search, Gmail, Chrome Web Store, and the web
         for (const key of Object.keys(requestHeaders)) {
-          if (key.toLowerCase().startsWith('sec-ch-ua')) {
+          const lower = key.toLowerCase();
+          if (lower.startsWith('sec-ch-ua') || lower === 'user-agent') {
             delete requestHeaders[key];
           }
         }
@@ -186,7 +229,7 @@ export class NetworkShieldEngine {
     });
 
     ses.webRequest.onHeadersReceived((details, callback) => {
-      if (!details.responseHeaders) {
+      if (!details.responseHeaders || isExtensionRequestDetails(details)) {
         return callback({});
       }
       let host = '';
@@ -215,7 +258,7 @@ export class NetworkShieldEngine {
         return callback({ responseHeaders });
       }
 
-      return callback({ responseHeaders: details.responseHeaders });
+      return callback({});
     });
   }
 }

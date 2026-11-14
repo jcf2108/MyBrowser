@@ -335,29 +335,38 @@ function resolveExtensionIconDataUrl(
   return null;
 }
 
-const CHROME_EXTENSION_API_SHIM = `/* __MYBROWSER_CHROME_SHIM_V2__ */
+const CHROME_EXTENSION_API_SHIM = `/* __MYBROWSER_CHROME_SHIM_V4__ */
 (function() {
   const g = typeof globalThis !== 'undefined' ? globalThis : self;
   if (!g.chrome) g.chrome = {};
-  const makeEvent = () => ({
-    addListener() {},
-    removeListener() {},
-    hasListener() { return false; },
-    hasListeners() { return false; }
-  });
+  const makeEvent = () => {
+    const listeners = [];
+    return {
+      addListener(fn) { if (typeof fn === 'function' && !listeners.includes(fn)) listeners.push(fn); },
+      removeListener(fn) { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); },
+      hasListener(fn) { return listeners.includes(fn); },
+      hasListeners() { return listeners.length > 0; },
+      _emit(...args) { for (const fn of listeners.slice()) { try { fn(...args); } catch {} } }
+    };
+  };
   const makeProxy = (target = {}) => new Proxy(target, {
     get(obj, prop) {
-      if (prop in obj && obj[prop] !== undefined) return obj[prop];
+      if (prop in obj && obj[prop] !== undefined) {
+        const val = obj[prop];
+        return typeof val === 'function' ? val.bind(obj) : val;
+      }
       if (prop === 'then' || typeof prop === 'symbol') return undefined;
       if (typeof prop === 'string' && prop.startsWith('on')) {
         obj[prop] = makeEvent();
         return obj[prop];
       }
+      const returnsBool =
+        typeof prop === 'string' && /^(request|contains|remove)$/i.test(prop);
       const returnsArray =
         typeof prop === 'string' &&
         /^(getAll|query|getDynamicRules|getSessionRules|getRegisteredContentScripts|getContexts|search|getViews)$/i.test(prop);
       const fn = function(...args) {
-        const fallback = returnsArray ? [] : {};
+        const fallback = returnsBool ? true : returnsArray ? [] : {};
         const cb = args[args.length - 1];
         if (typeof cb === 'function') { try { cb(fallback); } catch {} }
         return Promise.resolve(fallback);
@@ -381,6 +390,27 @@ const CHROME_EXTENSION_API_SHIM = `/* __MYBROWSER_CHROME_SHIM_V2__ */
       }
     } catch {}
   }
+  try {
+    if (g.chrome.tabs && typeof g.chrome.tabs === 'object') {
+      if (typeof g.chrome.tabs.getCurrent !== 'function') {
+        g.chrome.tabs.getCurrent = function(cb) {
+          if (typeof cb === 'function') {
+            setTimeout(() => { try { cb(undefined); } catch {} }, 0);
+          }
+          return Promise.resolve(undefined);
+        };
+      }
+    } else {
+      g.chrome.tabs = makeProxy({
+        getCurrent(cb) {
+          if (typeof cb === 'function') {
+            setTimeout(() => { try { cb(undefined); } catch {} }, 0);
+          }
+          return Promise.resolve(undefined);
+        }
+      });
+    }
+  } catch {}
 })();
 `;
 
@@ -412,9 +442,9 @@ function patchExtensionForElectronCompatibility(
       const swPath = path.join(extDir, swRel.replace(/^\//, ''));
       if (fs.existsSync(swPath)) {
         const swContent = fs.readFileSync(swPath, 'utf-8');
-        if (!swContent.includes('__MYBROWSER_CHROME_SHIM_V2__')) {
+        if (!swContent.includes('__MYBROWSER_CHROME_SHIM_V4__')) {
           const cleaned = swContent.replace(
-            /\/\* __MYBROWSER_CHROME_SHIM__ \*\/[\s\S]*?\}\)\(\);\s*/m,
+            /\/\* __MYBROWSER_CHROME_SHIM(?:_V\d+)?__ \*\/[\s\S]*?\}\)\(\);\s*/m,
             ''
           );
           fs.writeFileSync(swPath, `${CHROME_EXTENSION_API_SHIM}\n${cleaned}`, 'utf-8');
@@ -453,10 +483,25 @@ function readExtensionManifest(extDir: string): ParsedManifestInfo {
   }
 
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+  let manifestDirty = false;
 
   // Remove minimum_chrome_version if present so Electron's internal Chromium version check does not block recent extensions (e.g. Bitwarden 2026+)
   if (manifest.minimum_chrome_version) {
     delete manifest.minimum_chrome_version;
+    manifestDirty = true;
+  }
+
+  // Promote optional_host_permissions into host_permissions so self-hosted extension endpoints get full cross-origin fetch access
+  if (Array.isArray(manifest.optional_host_permissions) && manifest.optional_host_permissions.length > 0) {
+    const existingHosts = Array.isArray(manifest.host_permissions) ? manifest.host_permissions : [];
+    const mergedHosts = Array.from(new Set([...existingHosts, ...manifest.optional_host_permissions]));
+    if (mergedHosts.length !== existingHosts.length) {
+      manifest.host_permissions = mergedHosts;
+      manifestDirty = true;
+    }
+  }
+
+  if (manifestDirty) {
     try {
       fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');
     } catch {
@@ -527,6 +572,10 @@ export class ExtensionManager {
 
   public getStatusMessage(): string | null {
     return this.statusMessage;
+  }
+
+  public getPopupWindow(): BrowserWindow | null {
+    return this.popupWindow && !this.popupWindow.isDestroyed() ? this.popupWindow : null;
   }
 
   public async loadInstalledExtensionsOnStartup(): Promise<void> {
@@ -794,7 +843,7 @@ export class ExtensionManager {
           session: activeSession,
           contextIsolation: true,
           nodeIntegration: false,
-          sandbox: true,
+          sandbox: false,
         },
       });
 

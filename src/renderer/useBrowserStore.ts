@@ -189,13 +189,13 @@ function buildInitialState(): BrowserStateSnapshot {
     extensionInstalling: false,
     extensionStatusMessage: null,
     updater: {
-      currentVersion: '0.1.8',
-      latestVersion: '0.1.8',
+      currentVersion: '0.1.9',
+      latestVersion: '0.1.9',
       status: 'up-to-date',
       progressPercent: 0,
       releaseUrl: 'https://github.com/jcf2108/MyBrowser/releases',
       downloadUrl: null,
-      message: 'MyBrowser v0.1.8 est à jour.',
+      message: 'MyBrowser v0.1.9 est à jour.',
     },
   };
 }

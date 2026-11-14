@@ -32,6 +32,7 @@ import { NetworkShieldEngine } from './adblocker';
 import { LocalEcosystemBridge, probeLocalPort } from './localBridge';
 import { ExtensionManager, extractCwsExtensionId } from './extensionManager';
 import { UpdateManager } from './updateManager';
+import { CertificateTrustManager } from './tlsHelper';
 
 // Enable Chromium Hardware Acceleration, WebGL2 and WebGPU for 3D apps
 app.commandLine.appendSwitch('enable-unsafe-webgpu');
@@ -40,6 +41,11 @@ app.commandLine.appendSwitch('enable-gpu-rasterization');
 app.commandLine.appendSwitch('enable-zero-copy');
 // Hide navigator.webdriver / AutomationControlled blink flags so Google OAuth & anti-bot checks treat MyBrowser as a standard desktop browser
 app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled');
+// Allow extensions (e.g. Bitwarden self-hosted) and pages to reach LAN / Split-DNS / private IP servers without PNA preflight blocks
+app.commandLine.appendSwitch(
+  'disable-features',
+  'BlockInsecurePrivateNetworkRequests,PrivateNetworkAccessRespectPreflightResults,PrivateNetworkAccessSendPreflights'
+);
 
 const DEFAULT_CHROME_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.55 Safari/537.36';
@@ -68,12 +74,15 @@ class MyBrowserKernel {
 
   private connectedApps: ConnectedApp[] = [...DEFAULT_CONNECTED_APPS];
   private scripts: UserScriptRecipe[] = [...DEFAULT_SCRIPTS];
+  private trustedCertificates: string[] = [];
+  private certVerifierPartitions = new Set<string>();
   private lastExtraction: AgentExtractionResult | null = null;
 
   private shield: NetworkShieldEngine;
   private bridge: LocalEcosystemBridge;
   private extensionManager: ExtensionManager;
   private updateManager: UpdateManager;
+  private certTrustManager: CertificateTrustManager;
   private currentBounds: ViewportBoundsPayload = {
     primary: null,
     secondary: null,
@@ -107,6 +116,14 @@ class MyBrowserKernel {
       },
       onStateChanged: () => this.broadcastState(),
     });
+    this.certTrustManager = new CertificateTrustManager({
+      initialTrustedEntries: this.trustedCertificates,
+      onSave: (entries) => {
+        this.trustedCertificates = entries;
+        this.savePersistedConfig();
+      },
+      getDialogParent: () => this.extensionManager.getPopupWindow() || this.mainWindow,
+    });
     this.updateManager = new UpdateManager(() => this.broadcastState());
   }
 
@@ -139,6 +156,11 @@ class MyBrowserKernel {
         if (Array.isArray(raw.scripts) && raw.scripts.length > 0) {
           this.scripts = raw.scripts;
         }
+        if (Array.isArray(raw.trustedCertificates)) {
+          this.trustedCertificates = raw.trustedCertificates.filter(
+            (x: unknown): x is string => typeof x === 'string' && x.includes('|')
+          );
+        }
       }
     } catch {
       // Fallback to defaults if config file is corrupted
@@ -165,6 +187,7 @@ class MyBrowserKernel {
             connectedApps: this.connectedApps,
             workspaces: this.workspaces,
             scripts: this.scripts,
+            trustedCertificates: this.trustedCertificates,
           },
           null,
           2
@@ -192,6 +215,10 @@ class MyBrowserKernel {
         sandbox: false,
       },
     });
+
+    session.defaultSession.setCertificateVerifyProc((req, cb) =>
+      this.certTrustManager.handleVerifyProc(req, cb)
+    );
 
     for (const ws of this.workspaces) {
       this.ensureWorkspaceSession(ws);
@@ -223,6 +250,12 @@ class MyBrowserKernel {
   private ensureWorkspaceSession(ws: Workspace) {
     const ses = session.fromPartition(ws.partition);
     ses.setUserAgent(DEFAULT_CHROME_UA);
+    if (!this.certVerifierPartitions.has(ws.partition)) {
+      this.certVerifierPartitions.add(ws.partition);
+      ses.setCertificateVerifyProc((req, cb) =>
+        this.certTrustManager.handleVerifyProc(req, cb)
+      );
+    }
     this.shield.attachToSession(ws.partition, ws.id, ses, () => {
       const active = this.tabs.find((t) => t.id === this.activeTabId);
       if (active) {
@@ -1315,9 +1348,59 @@ class MyBrowserKernel {
       return this.getSnapshot();
     });
   }
+
+  public getActiveDialogParent(): BrowserWindow | null {
+    return this.extensionManager.getPopupWindow() || this.mainWindow;
+  }
 }
 
 const kernel = new MyBrowserKernel();
+
+app.on('select-client-certificate', (event, _webContents, url, certificateList, callback) => {
+  event.preventDefault();
+  if (!certificateList || certificateList.length === 0) {
+    callback();
+    return;
+  }
+
+  let host = url;
+  try {
+    host = new URL(url).hostname || url;
+  } catch {
+    // Keep raw URL
+  }
+
+  const candidates = certificateList.slice(0, 4);
+  const buttons = [
+    'Continuer sans certificat',
+    ...candidates.map((c) => c.subjectName || c.issuerName || 'Certificat client'),
+  ];
+  const parent = kernel.getActiveDialogParent();
+  const options = {
+    type: 'question' as const,
+    buttons,
+    defaultId: 0,
+    cancelId: 0,
+    noLink: true,
+    title: 'Certificat client',
+    message: `Certificat demandé par « ${host} »`,
+  };
+
+  const promise =
+    parent && !parent.isDestroyed()
+      ? dialog.showMessageBox(parent, options)
+      : dialog.showMessageBox(options);
+
+  promise
+    .then((res) => {
+      if (res.response >= 1 && candidates[res.response - 1]) {
+        callback(candidates[res.response - 1]);
+      } else {
+        callback();
+      }
+    })
+    .catch(() => callback());
+});
 
 app.whenReady().then(() => {
   kernel.registerIpcHandlers();
